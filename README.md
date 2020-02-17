@@ -8,7 +8,7 @@ Many practitioners ignore the order in which their learning models are trained o
 Yet, in many cases, learning may benefit from ordered training data.
 This is due to the progressive differentiation underlying the learning dynamics of many neural networks.
   
-### Proposal
+### Co-occurrence Distributions & Entropy
 
 The current proposal is specific to learning lexical categories by predicting sequences of natural language. 
 Though, it could be applied to any category learning problems.
@@ -49,20 +49,26 @@ because the distribution only consists of a small number of slot 2 words.
 Thinking about this in terms of information theory, one could say that the joint entropy, H(noun, slot 2), has been reduced, 
 while keeping constant the conditional entropy, H(noun|slot2).
 
-To better understand how such a corpus might look like, one could imagine replacing slot 2 words with samples from a smaller set of symbols.
-Another way to understand this is to imagine that nouns are frequently followed by a period. 
-Rather than being followed by words from a large population of possible slot 2 words, 
-if a noun is frequently followed by a period, this would learning the noun category more efficient.
+To better understand how such a corpus might look like, one could imagine replacing slot 2 words with samples from a smaller set of symbols. 
 
 The worst corpus for learning similar representations for nouns would be one in which each noun is followed by a different slot 2 word:
 
 <img src="images/worst_case.png" width="400">
+
+### Order
 
 How can the corpus of 2-word sequences be ordered to learn the noun category as efficiently as possible?
 A good strategy would be to sample those 2-word sequences first that:
 1. have a noun in slot 1
 2. have a slot 2 word whose distribution (conditioned on the presence of a noun in slot 1) has a large entropy, H(noun|slot 2 word).
 
+For example, one could sample sequences from the actual corpus corresponding to rows in the first figure which are most entropic. 
+This would correspond to sampling those 2-word sequences first in which nouns are followed by punctuation, such as `.` and `?`. 
+Rather than being followed by words from a large population of possible slot 2 words, 
+if a noun is frequently followed by a period, this would speed acquisition of similar noun representations.
+
+Once, learning of those sequences has taken place, one can continue to train on examples corresponding to rows in the figure which are increasingly less entropic.
+This would result in progressive differentiation, in which ever finer grained distinctions of the noun category are learned. 
 
 
 
