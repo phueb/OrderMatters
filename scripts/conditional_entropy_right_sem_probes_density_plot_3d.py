@@ -15,7 +15,7 @@ CORPUS_NAME = 'childes-20191206'
 PROBES_NAME = 'sem-4096'
 NUM_TICKS = 2
 NUM_TYPES = 4096
-REMOVE_SYMBOLS = ['.', '?']
+REMOVE_SYMBOLS = None
 
 corpus_path = config.Dirs.corpora / f'{CORPUS_NAME}.txt'
 train_docs, _ = load_docs(corpus_path,

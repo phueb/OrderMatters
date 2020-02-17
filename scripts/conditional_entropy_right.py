@@ -19,7 +19,7 @@ from preppy import PartitionedPrep
 from preppy.docs import load_docs
 
 from ordermatters import config
-from ordermatters.utils import add_double_legend
+from ordermatters.figs import add_double_legend
 
 CORPUS_NAME = 'childes-20191206'
 WORDS_NAME = 'nouns-2972'

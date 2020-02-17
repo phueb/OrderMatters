@@ -2,8 +2,7 @@
 
 from numpy.lib.stride_tricks import as_strided
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
+from pyitlib import discrete_random_variable as drv
 
 from preppy import PartitionedPrep
 from preppy.docs import load_docs
@@ -15,7 +14,7 @@ CORPUS_NAME = 'childes-20191206'
 PROBES_NAME = 'sem-4096'
 NUM_TICKS = 2
 NUM_TYPES = 4096
-REMOVE_SYMBOLS = ['.', '?']
+REMOVE_SYMBOLS = None
 
 corpus_path = config.Dirs.corpora / f'{CORPUS_NAME}.txt'
 train_docs, _ = load_docs(corpus_path,
@@ -41,6 +40,29 @@ shape = (num_possible_windows, prep.num_tokens_in_window)
 windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
 print(f'Matrix containing all windows has shape={windows.shape}')
 
+# TODO the question: are teh two methods equivalent: 1. nouns are binary, 2. nouns are not binary
+
+###############
+# METHOD 2: use all windows, and make noun observations binary
+###############
+
+x1, x2 = np.array_split(windows[:, -2], 2, axis=0)  # CAT member
+y1, y2 = np.array_split(windows[:, -1], 2, axis=0)  # next-word
+
+# make binary
+x1 = [1 if prep.store.types[i] in probes else 0 for i in x1]
+x2 = [1 if prep.store.types[i] in probes else 0 for i in x2]
+
+ce1 = drv.entropy_conditional(x1, y1)
+ce2 = drv.entropy_conditional(x2, y2)
+print('method 1')
+print(ce1)
+print(ce2)
+
+###############
+# METHOD 2: use only probe windows, and leave noun observations non-binary
+###############
+
 # probe windows
 row_ids = np.isin(windows[:, -2], [prep.store.w2id[w] for w in probes])
 probe_windows = windows[row_ids]
@@ -49,12 +71,8 @@ print(f'num probe windows={len(probe_windows)}')
 x1, x2 = np.array_split(probe_windows[:, -2], 2, axis=0)  # CAT member
 y1, y2 = np.array_split(probe_windows[:, -1], 2, axis=0)  # next-word
 
-print(prep.store.types[np.bincount(x1).argmax().item()])  # most frequent in x1 is "one"
-print(prep.store.types[np.bincount(y1).argmax().item()])  # most frequent in y1 is "."
-
-g1 = sns.jointplot(x1, y1, kind='hex', ratio=1)
-g2 = sns.jointplot(x2, y2, kind='hex', ratio=1)
-
-plt.show()
-
-
+ce1 = drv.entropy_conditional(x1, y1)
+ce2 = drv.entropy_conditional(x2, y2)
+print('method 2')
+print(ce1)
+print(ce2)

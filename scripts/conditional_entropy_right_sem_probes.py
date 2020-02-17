@@ -20,11 +20,11 @@ from preppy.docs import load_docs
 from categoryeval.probestore import ProbeStore
 
 from ordermatters import config
-from ordermatters.utils import add_double_legend
+from ordermatters.figs import add_double_legend
 
 CORPUS_NAME = 'childes-20191206'
 PROBES_NAME = 'sem-4096'
-NUM_TICKS = 2
+NUM_TICKS = 4
 NUM_TYPES = 4096
 
 corpus_path = config.Dirs.corpora / f'{CORPUS_NAME}.txt'

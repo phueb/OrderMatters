@@ -2,6 +2,34 @@ from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 
 
+def make_example_fig(mat,
+                     xlabel='nouns (slot 1)',
+                     ylabel='next words (slot 2)'):
+    fig, ax = plt.subplots(dpi=163)
+    plt.title('', fontsize=5)
+
+    # heatmap
+    print('Plotting heatmap...')
+    ax.imshow(mat,
+              cmap=plt.get_cmap('jet'),
+              interpolation='nearest')
+
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.xaxis.set_ticklabels([])
+    ax.yaxis.set_ticklabels([])
+
+    # remove tick lines
+    lines = (ax.xaxis.get_ticklines() +
+             ax.yaxis.get_ticklines())
+    plt.setp(lines, visible=False)
+
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+
+    return fig, ax
+
+
 def add_double_legend(lines_list, labels1, labels2, y_offset=-0.3, fs=12):
 
     # make legend 2
