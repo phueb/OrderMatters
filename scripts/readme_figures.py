@@ -56,7 +56,7 @@ fig, ax = make_example_fig(np.log(cf_mat[:NUM_ROWS]))
 plt.title('Actual')
 plt.show()
 
-# make joint plot - ideal_slow
+# make joint plot - better but slow
 x = []
 y = []
 x_actual_set = np.unique(x_actual)
@@ -68,11 +68,11 @@ for xia in x_actual:
     cf_mat[yi, x2x[xi]] += 1
 fig, ax = make_example_fig(np.log(cf_mat[:NUM_ROWS]))
 
-plt.title('Ideal but slow')
+plt.title('Better but slow')
 plt.show()
 
 
-# make joint plot - ideal_fast
+# make joint plot - better and fast
 x = []
 y = []
 x_actual_set = np.unique(x_actual)
@@ -84,7 +84,7 @@ for xia in x_actual:
     cf_mat[yi, x2x[xi]] += 1
 fig, ax = make_example_fig(np.log(cf_mat[:NUM_ROWS]))
 
-plt.title('Ideal and fast')
+plt.title('Better and fast')
 plt.show()
 
 

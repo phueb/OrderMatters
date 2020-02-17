@@ -24,14 +24,15 @@ We can plot the co-occurrence pattern for slot 1 and slot 2 in a natural languag
  
 <img src="images/actual.png" width="400">
 
-Each point represents the co-occurrence between a noun, and another word occupying slot 2.
+Each point represents the co-occurrence between a noun in slot 1, and the word in slot 2.
 Some nouns occur more frequently than others (columns with darker hexagons),
-and some slot 2 words (next-words) occur more frequently than others (rows with darker hexagons).
+and some slot 2 words occur more frequently than others (rows with darker hexagons).
 
 A distributionally coherent noun category consists of members with maximally similar next-word distributions.
-Thus, the ideal co-occurrence pattern - for learning the noun category -  would be one in which all rows are identical:
+Thus, the ideal co-occurrence pattern - for learning the noun category -  would be one in which all rows are identical.
+The figure below illustrates co-occurrence patterns for a corpus in which slot 2 words occuring after nouns are sampled from the same uniform distribution:
 
-<img src="images/ideal_but_slow.png" width="400">
+<img src="images/better_but_slow.png" width="400">
 
 In the corpus of 2-word sequences illustrated above, the distributions (in the rows) over slot 2 words is more similar than in the figure above.
 This means that nouns (in the columns) will take on more similar representations. 
@@ -40,7 +41,7 @@ This is because each noun occurs with lots of slot 2 words; the network has to s
 
 Thus, a corpus that would induce similar noun representations and do so quickly would look like: 
 
-<img src="images/ideal_and_fast.png" width="400">
+<img src="images/better_and_fast.png" width="400">
 
 When the network sees a noun in this corpus, it quickly learns its distribution over slot 2 words, 
 because the distribution only consists of a small number of slot 2 words.
