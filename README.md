@@ -24,7 +24,7 @@ We can plot the co-occurrence pattern for slot 1 and slot 2 in a natural languag
  
 <img src="images/actual.png" width="400">
 
-Each hexagon represents the co-occurrence between a noun, and another word occupying slot 2.
+Each point represents the co-occurrence between a noun, and another word occupying slot 2.
 Some nouns occur more frequently than others (columns with darker hexagons),
 and some slot 2 words (next-words) occur more frequently than others (rows with darker hexagons).
 
@@ -55,6 +55,11 @@ if a noun is frequently followed by a period, this would learning the noun categ
 The worst corpus for learning similar representations for nouns would be one in which each noun is followed by a different slot 2 word:
 
 <img src="images/worst_case.png" width="400">
+
+How can the corpus of 2-word sequences be ordered to learn the noun category as efficiently as possible?
+A good strategy would be to sample those 2-word sequences first that:
+1. have a noun in slot 1
+2. have a slot 2 word whose distribution (conditioned on the presence of a noun in slot 1) has a large entropy, H(noun|slot 2 word).
 
 
 
