@@ -34,10 +34,11 @@ The figure below illustrates co-occurrence patterns for a corpus in which slot 2
 
 <img src="images/better_but_slow.png" width="400">
 
-In the corpus of 2-word sequences illustrated above, the distributions (in the rows) over slot 2 words is more similar than in the figure above.
-This means that nouns (in the columns) will take on more similar representations. 
-While this setup is ideal, as it will converge on similar noun representations, training will take relatively long.
-This is because each noun occurs with lots of slot 2 words; the network has to see lots of 2-word sequences to recognize that the distribution over slot 2 words are similar.
+In the corpus of 2-word sequences illustrated above, the distributions (in the rows) over slot 2 words is more similar compared to those in the actual corpus.
+This means that nouns (in the columns) will take on more similar representations in teh network. 
+While this corpus is better, training will take relatively long.
+This is because each noun occurs with lots of slot 2 words.
+The problem is that the network has to see lots of 2-word sequences to recognize that the distribution over slot 2 words are similar for each noun.
 
 Thus, a corpus that would induce similar noun representations and do so quickly would look like: 
 
