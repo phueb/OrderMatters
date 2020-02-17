@@ -55,6 +55,8 @@ The worst corpus for learning similar representations for nouns would be one in 
 
 <img src="images/worst_case.png" width="400">
 
+Note, that in this corpus, the mututal information between nouns and words in slot 2, I(noun; slot 2), is maximized. 
+
 ### Order
 
 How can the corpus of 2-word sequences be ordered to learn the noun category as efficiently as possible?
