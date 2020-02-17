@@ -66,6 +66,8 @@ For example, one could sample sequences from the actual corpus corresponding to 
 This would correspond to sampling those 2-word sequences first in which nouns are followed by punctuation, such as `.` and `?`. 
 Rather than being followed by words from a large population of possible slot 2 words, 
 if a noun is frequently followed by a period, this would speed acquisition of similar noun representations.
+One would have to verify that non-words are not frequently followed by periods, 
+otherwise all representations would become similar to each other, not just those for nouns.
 
 Once, learning of those sequences has taken place, one can continue to train on examples corresponding to rows in the figure which are increasingly less entropic.
 This would result in progressive differentiation, in which ever finer grained distinctions of the noun category are learned. 
