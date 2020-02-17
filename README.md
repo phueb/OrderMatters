@@ -60,7 +60,7 @@ The worst corpus for learning similar representations for nouns would be one in 
 How can the corpus of 2-word sequences be ordered to learn the noun category as efficiently as possible?
 A good strategy would be to sample those 2-word sequences first that:
 1. have a noun in slot 1
-2. have a slot 2 word whose distribution has a large conditional entropy, H(noun|slot 2 word).
+2. have a slot 2 word whose distribution has a large conditional entropy, H(noun|slot 2).
 
 For example, one could sample sequences from the actual corpus corresponding to rows in the first figure which are most entropic. 
 This would correspond to sampling those 2-word sequences first in which nouns are followed by punctuation, such as `.` and `?`. 
