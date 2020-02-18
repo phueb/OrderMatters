@@ -8,7 +8,9 @@ from preppy import PartitionedPrep
 
 
 def reorder_by_conditional_entropy(prep: PartitionedPrep,
-                                   probes: List[str]) -> List[int]:
+                                   probes: List[str],
+                                   verbose: bool = False,
+                                   ) -> List[int]:
     """
     1. compute conditional entropy of probe words, given distribution of words that follow them, for each partition.
     2. re-order partitions from high to low conditional entropy.
@@ -31,19 +33,24 @@ def reorder_by_conditional_entropy(prep: PartitionedPrep,
         y = probe_windows[:, -1]  # next-word
         ces.append(drv.entropy_conditional(x, y).item())
 
+    if verbose:
+        print([round(ce, 2) for ce in ces])
+
     # get indices that sort conditional entropies from highest to lowest H(X|Y)
     res = list(sorted(range(prep.num_parts), key=lambda i: ces[i], reverse=True))
     return res
 
 
 def reorder_by_joint_entropy(prep: PartitionedPrep,
-                                   probes: List[str]) -> List[int]:
+                             probes: List[str],
+                             verbose: bool = False,
+                             ) -> List[int]:
     """
     1. compute conditional entropy of probe words, given distribution of words that follow them, for each partition.
     2. re-order partitions from high to low conditional entropy.
     """
     # calc H(X|Y) for each part
-    ces = []
+    jes = []
     for part in prep.reordered_parts:
         # windows
         token_ids_array = part.astype(np.int64)
@@ -59,8 +66,11 @@ def reorder_by_joint_entropy(prep: PartitionedPrep,
         x = probe_windows[:, -2]  # CAT member
         y = probe_windows[:, -1]  # next-word
         x_y = np.vstack((x, y))
-        ces.append(drv.entropy_joint(x_y).item())
+        jes.append(drv.entropy_joint(x_y).item())
+
+    if verbose:
+        print([round(je, 2) for je in jes])
 
     # get indices that sort conditional entropies from highest to lowest H(X|Y)
-    res = list(sorted(range(prep.num_parts), key=lambda i: ces[i], reverse=True))
+    res = list(sorted(range(prep.num_parts), key=lambda i: jes[i], reverse=True))
     return res

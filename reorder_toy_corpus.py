@@ -21,8 +21,8 @@ prep = PartitionedPrep(tc.docs,
 
 # input to spearman correlation
 ordered_part_ids = [n for n in range(NUM_PARTS)]
-reordered_part_ids_ce = reorder_by_conditional_entropy(prep, probes)
-reordered_part_ids_je = reorder_by_joint_entropy(prep, probes)
+reordered_part_ids_ce = reorder_by_conditional_entropy(prep, probes, verbose=True)
+reordered_part_ids_je = reorder_by_joint_entropy(prep, probes, verbose=True)
 
 print('ordering by decreasing conditional entropy:')
 rho, p_value = spearmanr(ordered_part_ids, reordered_part_ids_ce)
