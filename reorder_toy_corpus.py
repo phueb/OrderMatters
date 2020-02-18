@@ -9,7 +9,7 @@ from ordermatters.reorder import reorder_by_joint_entropy
 NUM_PARTS = 32
 NUM_TYPES = 4096
 
-tc = ToyCorpus(num_parts=NUM_PARTS, num_types=NUM_TYPES)
+tc = ToyCorpus(num_docs=NUM_PARTS, num_types=NUM_TYPES)
 probes = tc.nouns
 prep = PartitionedPrep(tc.docs,
                        reverse=False,
