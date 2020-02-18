@@ -33,10 +33,6 @@ def reorder_by_conditional_entropy(prep: PartitionedPrep,
 
     # get indices that sort conditional entropies from highest to lowest H(X|Y)
     res = list(sorted(range(prep.num_parts), key=lambda i: ces[i], reverse=True))
-
-    # TODO Debugging
-    print([round(ces[i], 2) for i in res])
-
     return res
 
 
@@ -67,8 +63,4 @@ def reorder_by_joint_entropy(prep: PartitionedPrep,
 
     # get indices that sort conditional entropies from highest to lowest H(X|Y)
     res = list(sorted(range(prep.num_parts), key=lambda i: ces[i], reverse=True))
-
-    # TODO Debugging
-    print([round(ces[i], 2) for i in res])
-
     return res
