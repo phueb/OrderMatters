@@ -11,7 +11,7 @@ def make_example_fig(mat,
     # heatmap
     print('Plotting heatmap...')
     ax.imshow(mat,
-              cmap=plt.get_cmap('jet'),
+              cmap=plt.get_cmap('cividis'),
               interpolation='nearest')
 
     ax.set_xticks([])

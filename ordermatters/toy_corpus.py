@@ -23,17 +23,23 @@ class ToyCorpus:
                  num_types: int = 4096,
                  num_nouns: int = 512,
                  divisor: int = 2,  # the larger, the more constrained are non-nouns
+                 min_nouns: int = 100,
+                 doc_offset: int = 6,  # the larger, the faster the noun population reaches its maximum
                  ) -> None:
         self.num_docs = num_docs
         self.doc_size = doc_size
         self.num_types = num_types
         self.num_nouns = num_nouns
+        self.min_nouns = min_nouns
+        self.doc_offset = doc_offset
 
-        self.nouns = [f'n{i}' for i in range(self.num_nouns)]
-        self.others = [f'o{i}' for i in range(self.num_types - self.num_nouns)]
+        self.nouns = [f'n{i:0>6}' for i in range(self.num_nouns)]
+        self.others = [f'o{i:0>6}' for i in range(self.num_types - self.num_nouns)]
 
         # a smaller set of non-nouns (non-nouns are preferentially sampled from this population in early documents)
         self.limited_others = [o for o in self.others if float(o[1:]) % divisor == 0]
+
+        print('Initialized ToyCorpus with number of limited non-nouns:', len(self.limited_others))
 
     @cached_property
     def docs(self) -> List[str]:
@@ -42,15 +48,13 @@ class ToyCorpus:
 
     def doc(self,
             doc_id,
-            min_nouns: int = 100,
-            doc_offset: int = 6,  # the larger, the faster the noun population reaches its maximum
             )-> str:
 
-        assert 0 < doc_offset < self.num_docs
+        assert 0 <= self.doc_offset <= self.num_docs
 
         # gradually increase noun population across consecutive documents
-        limit = self.num_nouns * ((doc_id + doc_offset) / self.num_docs)
-        nouns = self.nouns[:int(max(min_nouns, limit))]
+        limit = self.num_nouns * ((doc_id + self.doc_offset) / self.num_docs)
+        nouns = self.nouns[:int(max(self.min_nouns, limit + 1))]
 
         # probability of constraining population of non-nouns
         prob = doc_id / self.num_docs
@@ -62,13 +66,10 @@ class ToyCorpus:
             noun = random.choice(nouns)
 
             # sample next-word - sometimes from a limited population
-            if random.random() > prob:  # make non-noun population conditional on nouns
+            if random.random() > prob:
                 others = self.limited_others
-                print('Making conditional', len(others))
             else:
                 others = self.others
-                print('Leaving as is', len(others))
-
             other = random.choice(others)
             res += f'{noun} {other} '  # whitespace after each
         return res
