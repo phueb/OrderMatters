@@ -47,9 +47,9 @@ def reorder_by_joint_entropy(prep: PartitionedPrep,
                              ) -> List[int]:
     """
     1. compute conditional entropy of probe words, given distribution of words that follow them, for each partition.
-    2. re-order partitions from high to low conditional entropy.
+    2. re-order partitions from low to high joint entropy.
     """
-    # calc H(X|Y) for each part
+    # calc H(X,Y) for each part
     jes = []
     for part in prep.reordered_parts:
         # windows
@@ -62,7 +62,7 @@ def reorder_by_joint_entropy(prep: PartitionedPrep,
         row_ids = np.isin(windows[:, -2], [prep.store.w2id[w] for w in probes])
         probe_windows = windows[row_ids]
 
-        # conditional entropy
+        # joint entropy
         x = probe_windows[:, -2]  # CAT member
         y = probe_windows[:, -1]  # next-word
         x_y = np.vstack((x, y))
@@ -71,6 +71,39 @@ def reorder_by_joint_entropy(prep: PartitionedPrep,
     if verbose:
         print([round(je, 2) for je in jes])
 
-    # get indices that sort conditional entropies from highest to lowest H(X|Y)
-    res = list(sorted(range(prep.num_parts), key=lambda i: jes[i], reverse=True))
+    # get indices that sort joint entropies from lowest to highest
+    res = list(sorted(range(prep.num_parts), key=lambda i: jes[i], reverse=False))
+    return res
+
+
+def reorder_by_y_entropy(prep: PartitionedPrep,
+                         probes: List[str],
+                         verbose: bool = False,
+                         ) -> List[int]:
+    """
+    1. compute conditional entropy of probe words, given distribution of words that follow them, for each partition.
+    2. re-order partitions from low to high Y entropy.
+    """
+    # calc H(Y) for each part
+    yes = []
+    for part in prep.reordered_parts:
+        # windows
+        token_ids_array = part.astype(np.int64)
+        num_possible_windows = len(token_ids_array) - prep.num_tokens_in_window
+        shape = (num_possible_windows, prep.num_tokens_in_window)
+        windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
+
+        # windows with probe in position -2
+        row_ids = np.isin(windows[:, -2], [prep.store.w2id[w] for w in probes])
+        probe_windows = windows[row_ids]
+
+        # entropy of Y
+        y = probe_windows[:, -1]  # next-word
+        yes.append(drv.entropy_joint(y).item())
+
+    if verbose:
+        print([round(je, 2) for je in yes])
+
+    # get indices that sort Y entropies from low to high
+    res = list(sorted(range(prep.num_parts), key=lambda i: yes[i], reverse=False))
     return res

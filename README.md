@@ -74,6 +74,19 @@ otherwise all representations would become similar to each other, not just those
 Once, learning of those sequences has taken place, one can continue to train on examples corresponding to rows in the figure which are increasingly less entropic.
 This would result in progressive differentiation, in which ever finer grained distinctions of the noun category are learned. 
 
+### Results of Re-ordering AO-CHILDES
+
+Ordering 32 partitions of AO-CHILDES by decreasing conditional entropy of nouns, 
+the uncertainty of what noun occurs given its next word,
+reproduces the original age-order of AO-CHILDES quite well. 
+The Spearman rank correlation is rho=0.61 (p=0.0002).
+Ordering the 32 partitions by the entropy of the next-word distribution, produces even better results.
+The Spearman rank correlation is rho=0.82 (p<0.0000).
+The best observed ordering, which best recapitulates the age-order of AO-CHILDES partitions,
+is achieved when ordering the partitions by *increasing* conditional entropy of verbs,
+achieving rho=0.89 (p<0.0000). 
+One can interpret this to mean that verbs are used in more lexically specific contexts in speech to younger children,
+and that as children get older, they hear verbs in less lexically specific contexts.
 
 
  
