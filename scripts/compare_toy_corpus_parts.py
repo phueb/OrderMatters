@@ -13,14 +13,15 @@ NUM_DOCS = 2
 NUM_NOUNS = 512
 MIN_NOUNS = 512  # this needs to be large to result in reduction in conditional entropy
 NUM_TYPES = 1024  # this needs to be large to result in reduction in conditional entropy
-DIVISOR = 8
+DIVISOR = 1  # can be used in combination with FRAGMENTED_CONTROl
+FRAGMENTED_CONTROL = True
 
 tc = ToyCorpus(num_docs=NUM_DOCS,
                num_nouns=NUM_NOUNS,
                num_types=NUM_TYPES,
                divisor=DIVISOR,
                min_nouns=MIN_NOUNS,
-               doc_offset=2,
+               fragmented_control=FRAGMENTED_CONTROL,
                )
 prep = PartitionedPrep(tc.docs,
                        reverse=False,

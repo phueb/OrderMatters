@@ -1,6 +1,7 @@
 from typing import List
 from cached_property import cached_property
 import random
+from itertools import cycle
 
 
 class ToyCorpus:
@@ -24,7 +25,8 @@ class ToyCorpus:
                  num_nouns: int = 512,
                  divisor: int = 2,  # the larger, the more constrained are non-nouns
                  min_nouns: int = 100,
-                 doc_offset: int = 6,  # the larger, the faster the noun population reaches its maximum
+                 doc_offset: int = 0,  # the larger, the faster the noun population reaches its maximum
+                 fragmented_control: bool = False,  # split nouns in 2 categories
                  ) -> None:
         self.num_docs = num_docs
         self.doc_size = doc_size
@@ -32,12 +34,19 @@ class ToyCorpus:
         self.num_nouns = num_nouns
         self.min_nouns = min_nouns
         self.doc_offset = doc_offset
+        self.fragmented_control = fragmented_control
 
         self.nouns = [f'n{i:0>6}' for i in range(self.num_nouns)]
         self.others = [f'o{i:0>6}' for i in range(self.num_types - self.num_nouns)]
 
         # a smaller set of non-nouns (non-nouns are preferentially sampled from this population in early documents)
         self.limited_others = [o for o in self.others if float(o[1:]) % divisor == 0]
+
+        # TODO test - some nouns occur with on set of others and others occur with another
+        lo1 = [o for o in self.others if float(o[1:]) % 2 == 0]
+        lo2 = [o for o in self.others if float(o[1:]) % 2 != 0]
+        los = cycle([lo1, lo2])
+        self.noun2limited_others = {noun: next(los) for noun in self.nouns}
 
         print('Initialized ToyCorpus with number of limited non-nouns:', len(self.limited_others))
 
@@ -48,7 +57,7 @@ class ToyCorpus:
 
     def doc(self,
             doc_id,
-            )-> str:
+            ) -> str:
 
         assert 0 <= self.doc_offset <= self.num_docs
 
@@ -65,11 +74,14 @@ class ToyCorpus:
             # sample noun randomly
             noun = random.choice(nouns)
 
+            # sample next-word from one of two population (this keeps overall type frequency the same)
+            if self.fragmented_control and doc_id != 0:  # nouns fall into exactly 2 sub-categories
+                other = random.choice(self.noun2limited_others[noun])
             # sample next-word - sometimes from a limited population
-            if random.random() > prob:
-                others = self.limited_others
+            elif random.random() > prob:
+                other = random.choice(self.limited_others)
+            # no strategic sampling
             else:
-                others = self.others
-            other = random.choice(others)
+                other = random.choice(self.others)
             res += f'{noun} {other} '  # whitespace after each
         return res
