@@ -25,8 +25,8 @@ We can plot the co-occurrence pattern for slot 1 and slot 2 in a natural languag
 <img src="images/actual.png" width="400">
 
 Each point represents the co-occurrence between a noun in slot 1, and the word in slot 2.
-Some nouns occur more frequently than others (columns with darker hexagons),
-and some slot 2 words occur more frequently than others (rows with darker hexagons).
+Some nouns occur more frequently than others (columns with lighter colors),
+and some slot 2 words occur more frequently than others (rows with lighter colors).
 
 A distributionally coherent noun category consists of members with maximally similar next-word distributions.
 Thus, the ideal co-occurrence pattern - for learning the noun category -  would be one in which all rows are identical.
