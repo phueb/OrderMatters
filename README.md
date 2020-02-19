@@ -46,8 +46,7 @@ Thus, a corpus that would induce similar noun representations and do so quickly 
 
 When the RNN sees a noun in this corpus, it quickly learns its distribution over slot 2 words, 
 because the distribution only consists of a small number of slot 2 words.
-Thinking about this in terms of information theory, one could say that the joint entropy, H(noun, slot 2), has been reduced, 
-while keeping constant the conditional entropy, H(noun|slot2).
+Thinking about this in terms of information theory, one could say that the joint entropy, H(noun, slot 2), has been reduced
 
 To better understand how such a corpus might look like, one could imagine replacing slot 2 words with samples from a smaller set of symbols. 
 

@@ -48,6 +48,7 @@ for part_id, part in enumerate(prep.reordered_parts):
     # conditional entropy
     x = probe_windows[:, -2]  # CAT member
     y = probe_windows[:, -1]  # next-word
+    x_y = np.vstack((x, y))   # joint outcome
 
     # map word ID of nouns to IDs between [0, len(probes)]
     # this makes creating a matrix with the right number of columns easier
@@ -60,7 +61,9 @@ for part_id, part in enumerate(prep.reordered_parts):
     last_num_rows = NUM_TYPES - NUM_NOUNS  # other rows are just empty because of nouns not occurring with nouns
     fig, ax = make_example_fig(np.log(cf_mat[-last_num_rows:]))
     ce = drv.entropy_conditional(x, y).item()
-    plt.title(f'Toy Corpus Part {part_id}\nH(noun|slot 2)={ce:.4f}')
+    je = drv.entropy_joint(x_y).item()
+    ye = drv.entropy_joint(y).item()
+    plt.title(f'Toy Corpus Part {part_id+1}\nH(noun|slot 2)={ce:.4f}\nH(noun,slot 2)={je:.4f}\nH(slot 2)={ye:.4f}')
     plt.show()
 
     print(np.var(cf_mat, axis=0).shape)
