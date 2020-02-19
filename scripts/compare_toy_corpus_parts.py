@@ -7,14 +7,15 @@ from preppy import PartitionedPrep
 
 from ordermatters.figs import make_example_fig
 from ordermatters.toy_corpus import ToyCorpus
+from ordermatters.figs import plot_singular_values
 
-NUM_PARTS = 2
+NUM_DOCS = 2
 NUM_NOUNS = 512
-MIN_NOUNS = 512  # this needs to be large to result in positive rho when sorting using conditional entropy
-NUM_TYPES = 1024  # this needs to be large to result in positive rho when sorting using conditional entropy
+MIN_NOUNS = 512  # this needs to be large to result in reduction in conditional entropy
+NUM_TYPES = 1024  # this needs to be large to result in reduction in conditional entropy
 DIVISOR = 8
 
-tc = ToyCorpus(num_docs=NUM_PARTS,
+tc = ToyCorpus(num_docs=NUM_DOCS,
                num_nouns=NUM_NOUNS,
                num_types=NUM_TYPES,
                divisor=DIVISOR,
@@ -24,12 +25,14 @@ tc = ToyCorpus(num_docs=NUM_PARTS,
 prep = PartitionedPrep(tc.docs,
                        reverse=False,
                        num_types=NUM_TYPES,
-                       num_parts=NUM_PARTS,
+                       num_parts=2,
                        num_iterations=[1, 1],
                        batch_size=64,
                        context_size=1)
 probes = [p for p in tc.nouns if p in prep.store.w2id]
 
+s_list = []
+num_sv = 8
 for part_id, part in enumerate(prep.reordered_parts):
 
     # windows
@@ -51,14 +54,25 @@ for part_id, part in enumerate(prep.reordered_parts):
     x2x = {xi: n for n, xi in enumerate(np.unique(x))}
 
     # make co-occurrence plot
-    cf_mat1 = np.ones((prep.num_types, len(x2x))) * 1e-9
+    cf_mat = np.ones((prep.num_types, len(x2x))) * 1e-9
     for xi, yi in zip(x, y):
-        cf_mat1[yi, x2x[xi]] += 1
+        cf_mat[yi, x2x[xi]] += 1
     last_num_rows = NUM_TYPES - NUM_NOUNS  # other rows are just empty because of nouns not occurring with nouns
-    fig, ax = make_example_fig(np.log(cf_mat1[-last_num_rows:]))
+    fig, ax = make_example_fig(np.log(cf_mat[-last_num_rows:]))
     ce = drv.entropy_conditional(x, y).item()
-    plt.title(f'Toy Corpus Part {part_id}\nH(X|Y)={ce:.4f}')
+    plt.title(f'Toy Corpus Part {part_id}\nH(noun|slot 2)={ce:.4f}')
     plt.show()
 
-    print(np.sum(cf_mat1))
+    print(np.var(cf_mat, axis=0).shape)
+    print(np.sum(np.var(cf_mat, axis=0)))  # row-wise variance is higher for part 1
+    print(np.sum(np.var(cf_mat, axis=1)))
+    print(np.sum(cf_mat))
+
+    # SVD
+    s = np.linalg.svd(cf_mat, compute_uv=False)
+    print(f'first {num_sv} singular values', ' '.join(['{:>6.2f}'.format(si) for si in s[:num_sv]]))
+    print(np.sum(s))
+    s_list.append(np.asarray(s[:num_sv]))
+
+plot_singular_values(s_list, max_s=num_sv)
 
