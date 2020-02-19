@@ -34,17 +34,17 @@ The figure below illustrates co-occurrence patterns for a corpus in which slot 2
 
 <img src="images/better_but_slow.png" width="400">
 
-In the corpus of 2-word sequences illustrated above, the distributions (in the rows) over slot 2 words is more similar compared to those in the actual corpus.
-This means that nouns (in the columns) will take on more similar representations in teh network. 
+In the corpus of 2-word sequences illustrated above, the rows (representing distributions over slot 2 words) are more similar to each other compared to those in the actual corpus.
+This means that nouns (in the columns) will take on more similar representations in the RNN. 
 While this corpus is better, training will take relatively long.
 This is because each noun occurs with lots of slot 2 words.
-The problem is that the network has to see lots of 2-word sequences to recognize that the distribution over slot 2 words are similar for each noun.
+The problem is that the RNN has to see lots of 2-word sequences to recognize that the distribution over slot 2 words are similar for each noun.
 
 Thus, a corpus that would induce similar noun representations and do so quickly would look like: 
 
 <img src="images/better_and_fast.png" width="400">
 
-When the network sees a noun in this corpus, it quickly learns its distribution over slot 2 words, 
+When the RNN sees a noun in this corpus, it quickly learns its distribution over slot 2 words, 
 because the distribution only consists of a small number of slot 2 words.
 Thinking about this in terms of information theory, one could say that the joint entropy, H(noun, slot 2), has been reduced, 
 while keeping constant the conditional entropy, H(noun|slot2).
@@ -55,7 +55,7 @@ The worst corpus for learning similar representations for nouns would be one in 
 
 <img src="images/worst_case.png" width="400">
 
-Note, that in this corpus, the mututal information between nouns and words in slot 2, I(noun; slot 2), is maximized. 
+Note, that in this corpus, the mutual information between nouns and words in slot 2, I(noun; slot 2), is maximized. 
 
 ### Order
 
