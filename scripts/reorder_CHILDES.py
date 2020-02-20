@@ -15,7 +15,8 @@ NUM_SKIP_FIRST_DOCS = 0
 
 # PROBES_NAME = 'verbs-1321'
 # PROBES_NAME = 'nouns-2972'
-PROBES_NAME = 'sem-4096'
+# PROBES_NAME = 'sem-4096'
+PROBES_NAME = 'adjs-498'
 
 corpus_path = config.Dirs.corpora / f'{CORPUS_NAME}.txt'
 docs, _ = load_docs(corpus_path, num_test_docs=0)
@@ -46,12 +47,12 @@ reordered_part_ids_ce = reorder_by_conditional_entropy(prep, probes)
 reordered_part_ids_je = reorder_by_joint_entropy(prep, probes)
 reordered_part_ids_ye = reorder_by_y_entropy(prep, probes)
 
-print('ordering by increasing conditional entropy:')
+print('ordering by decreasing conditional entropy:')
 rho, p_value = spearmanr(ordered_part_ids, reordered_part_ids_ce)
 print(f'rho={rho: .4f}')
 print(f'p-v={p_value: .4f}')
 
-print('ordering by decreasing joint entropy:')
+print('ordering by increasing joint entropy:')
 rho, p_value = spearmanr(ordered_part_ids, reordered_part_ids_je)
 print(f'rho={rho: .4f}')
 print(f'p-v={p_value: .4f}')

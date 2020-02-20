@@ -67,7 +67,6 @@ for part_id, part in enumerate(prep.reordered_parts):
     plt.title(f'Toy Corpus Part {part_id+1}\nH(noun|slot 2)={ce:.4f}\nH(noun,slot 2)={je:.4f}\nH(slot 2)={ye:.4f}')
     plt.show()
 
-    print(np.var(cf_mat, axis=0).shape)
     print(np.sum(np.var(cf_mat, axis=0)))  # row-wise variance is higher for part 1
     print(np.sum(np.var(cf_mat, axis=1)))
     print(np.sum(cf_mat))
@@ -75,7 +74,6 @@ for part_id, part in enumerate(prep.reordered_parts):
     # SVD
     s = np.linalg.svd(cf_mat, compute_uv=False)
     print(f'first {num_sv} singular values', ' '.join(['{:>6.2f}'.format(si) for si in s[:num_sv]]))
-    print(np.sum(s))
     s_list.append(np.asarray(s[:num_sv]))
 
 plot_singular_values(s_list, max_s=num_sv)
