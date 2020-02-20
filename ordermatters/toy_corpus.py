@@ -78,7 +78,7 @@ class ToyCorpus:
             if self.fragmented_control and doc_id != 0:  # nouns fall into exactly 2 sub-categories
                 other = random.choice(self.noun2limited_others[noun])
             # sample next-word - sometimes from a limited population
-            elif random.random() > prob:
+            elif random.random() < prob:
                 other = random.choice(self.limited_others)
             # no strategic sampling
             else:

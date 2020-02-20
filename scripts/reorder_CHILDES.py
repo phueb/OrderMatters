@@ -13,10 +13,10 @@ CORPUS_NAME = 'childes-20191206'
 REMOVE_NUMBER_WORDS = False
 NUM_SKIP_FIRST_DOCS = 0
 
-# PROBES_NAME = 'verbs-1321'
+PROBES_NAME = 'verbs-1321'
 # PROBES_NAME = 'nouns-2972'
 # PROBES_NAME = 'sem-4096'
-PROBES_NAME = 'adjs-498'
+# PROBES_NAME = 'adjs-498'
 
 corpus_path = config.Dirs.corpora / f'{CORPUS_NAME}.txt'
 docs, _ = load_docs(corpus_path, num_test_docs=0)
