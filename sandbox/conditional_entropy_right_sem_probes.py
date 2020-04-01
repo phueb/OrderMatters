@@ -24,7 +24,7 @@ from ordermatters.figs import add_double_legend
 
 CORPUS_NAME = 'childes-20191206'
 PROBES_NAME = 'sem-4096'
-NUM_TICKS = 4
+NUM_TICKS = 32
 NUM_TYPES = 4096
 
 corpus_path = config.Dirs.corpora / f'{CORPUS_NAME}.txt'
@@ -75,7 +75,7 @@ def collect_data(windows, reverse: bool):
         x = probe_windows[:, -2]  # CAT member
         y = probe_windows[:, -1]  # next-word
 
-        cei = drv.entropy_conditional(x, y)
+        cei = drv.entropy_conditional(x, y)  # order matters
 
         x_y = np.vstack((x, y))
         jei = drv.entropy_joint(x_y)
