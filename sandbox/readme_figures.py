@@ -6,7 +6,7 @@ from preppy import PartitionedPrep
 from preppy.docs import load_docs
 from categoryeval.probestore import ProbeStore
 
-from ordermatters import config
+from ordermatters import configs
 from ordermatters.figs import make_example_fig
 
 CORPUS_NAME = 'childes-20191206'
@@ -15,7 +15,7 @@ NUM_TYPES = 4096
 REMOVE_SYMBOLS = None
 NUM_ROWS = 512
 
-corpus_path = config.Dirs.corpora / f'{CORPUS_NAME}.txt'
+corpus_path = configs.Dirs.corpora / f'{CORPUS_NAME}.txt'
 train_docs, _ = load_docs(corpus_path,
                           remove_symbols=REMOVE_SYMBOLS)
 

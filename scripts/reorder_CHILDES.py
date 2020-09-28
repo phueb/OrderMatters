@@ -3,7 +3,7 @@ from scipy.stats import spearmanr
 from preppy import PartitionedPrep
 from preppy.docs import load_docs
 
-from ordermatters import config
+from ordermatters import configs
 from ordermatters.reorder import reorder_by_conditional_entropy
 from ordermatters.reorder import reorder_by_joint_entropy
 from ordermatters.reorder import reorder_by_y_entropy
@@ -18,7 +18,7 @@ PROBES_NAME = 'verbs-1321'
 # PROBES_NAME = 'sem-4096'
 # PROBES_NAME = 'adjs-498'
 
-corpus_path = config.Dirs.corpora / f'{CORPUS_NAME}.txt'
+corpus_path = configs.Dirs.corpora / f'{CORPUS_NAME}.txt'
 docs, _ = load_docs(corpus_path, num_test_docs=0)
 prep = PartitionedPrep(docs[NUM_SKIP_FIRST_DOCS:],
                        reverse=False,
@@ -29,12 +29,12 @@ prep = PartitionedPrep(docs[NUM_SKIP_FIRST_DOCS:],
                        context_size=1)
 
 # load a category of words, X, for which to compute conditional entropy, H(X|Y)
-probes_file_path = config.Dirs.words / f'{CORPUS_NAME}-{PROBES_NAME}.txt'
+probes_file_path = configs.Dirs.words / f'{CORPUS_NAME}-{PROBES_NAME}.txt'
 probes = [w for w in probes_file_path.read_text().split('\n') if w in prep.store.w2id]
 print('num probes', len(probes))
 
 if REMOVE_NUMBER_WORDS:  # number words are not nouns
-    number_words_file_path = config.Dirs.words / f'{CORPUS_NAME}-numbers.txt'
+    number_words_file_path = configs.Dirs.words / f'{CORPUS_NAME}-numbers.txt'
     for number in [w for w in number_words_file_path.read_text().split('\n')]:
         if number in probes:
             probes.remove(number)

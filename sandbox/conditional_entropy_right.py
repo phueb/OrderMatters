@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 from preppy import PartitionedPrep
 from preppy.docs import load_docs
 
-from ordermatters import config
+from ordermatters import configs
 from ordermatters.figs import add_double_legend
 
 CORPUS_NAME = 'childes-20191206'
@@ -26,7 +26,7 @@ WORDS_NAME = 'nouns-2972'
 NUM_TICKS = 2
 NUM_TYPES = 4096
 
-corpus_path = config.Dirs.corpora / f'{CORPUS_NAME}.txt'
+corpus_path = configs.Dirs.corpora / f'{CORPUS_NAME}.txt'
 train_docs, _ = load_docs(corpus_path)
 
 prep = PartitionedPrep(train_docs,
@@ -38,7 +38,7 @@ prep = PartitionedPrep(train_docs,
                        context_size=7,
                        )
 
-words_file_path = config.Dirs.words / f'{CORPUS_NAME}-{WORDS_NAME}.txt'
+words_file_path = configs.Dirs.words / f'{CORPUS_NAME}-{WORDS_NAME}.txt'
 probes = [w for w in words_file_path.read_text().split('\n') if w in prep.store.w2id]
 print(f'num probes={len(probes)}')
 

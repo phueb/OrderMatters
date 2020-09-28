@@ -16,7 +16,7 @@ from preppy import PartitionedPrep
 from preppy.docs import load_docs
 from categoryeval.probestore import ProbeStore
 
-from ordermatters import config
+from ordermatters import configs
 from ordermatters.figs import add_double_legend
 
 CORPUS_NAME = 'childes-20191206'
@@ -25,7 +25,7 @@ NUM_TICKS = 32
 NUM_TYPES = 4096
 DISTANCE = 4
 
-corpus_path = config.Dirs.corpora / f'{CORPUS_NAME}.txt'
+corpus_path = configs.Dirs.corpora / f'{CORPUS_NAME}.txt'
 train_docs, _ = load_docs(corpus_path)
 
 prep = PartitionedPrep(train_docs,

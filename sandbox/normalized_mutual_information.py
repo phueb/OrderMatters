@@ -16,7 +16,7 @@ from preppy import PartitionedPrep
 from preppy.docs import load_docs
 from categoryeval.probestore import ProbeStore
 
-from ordermatters import config
+from ordermatters import configs
 
 CORPUS_NAME = 'childes-20191206'
 PROBES_NAME = 'sem-4096'
@@ -52,7 +52,7 @@ def collect_data(windows_mat, reverse: bool):
     return res
 
 
-corpus_path = config.Dirs.corpora / f'{CORPUS_NAME}.txt'
+corpus_path = configs.Dirs.corpora / f'{CORPUS_NAME}.txt'
 train_docs, _ = load_docs(corpus_path)
 
 prep = PartitionedPrep(train_docs,
