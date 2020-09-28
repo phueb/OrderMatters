@@ -7,9 +7,11 @@ from ordermatters import configs
 from ordermatters.reorder import reorder_by_conditional_entropy
 from ordermatters.reorder import reorder_by_joint_entropy
 from ordermatters.reorder import reorder_by_y_entropy
+from ordermatters.reorder import reorder_by_information_interaction
 
 NUM_PARTS = 32
-CORPUS_NAME = 'newsela'  # 'childes-20191206'
+# CORPUS_NAME = 'newsela'
+CORPUS_NAME = 'childes-20191206'
 REMOVE_NUMBER_WORDS = False
 NUM_SKIP_FIRST_DOCS = 0
 
@@ -46,6 +48,7 @@ ordered_part_ids = [n for n in range(prep.num_parts)]
 reordered_part_ids_ce = reorder_by_conditional_entropy(prep, probes)
 reordered_part_ids_je = reorder_by_joint_entropy(prep, probes)
 reordered_part_ids_ye = reorder_by_y_entropy(prep, probes)
+reordered_part_ids_ii = reorder_by_information_interaction(prep, probes)
 
 print('ordering by decreasing conditional entropy:')
 rho, p_value = spearmanr(ordered_part_ids, reordered_part_ids_ce)
@@ -59,5 +62,10 @@ print(f'p-v={p_value: .4f}')
 
 print('ordering by increasing Y entropy:')
 rho, p_value = spearmanr(ordered_part_ids, reordered_part_ids_ye)
+print(f'rho={rho: .4f}')
+print(f'p-v={p_value: .4f}')
+
+print('ordering by increasing information-interaction:')
+rho, p_value = spearmanr(ordered_part_ids, reordered_part_ids_ii)
 print(f'rho={rho: .4f}')
 print(f'p-v={p_value: .4f}')

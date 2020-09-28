@@ -107,3 +107,36 @@ def reorder_by_y_entropy(prep: PartitionedPrep,
     # get indices that sort Y entropies from low to high
     res = list(sorted(range(prep.num_parts), key=lambda i: yes[i], reverse=False))
     return res
+
+
+def reorder_by_information_interaction(prep: PartitionedPrep,
+                                       probes: List[str],
+                                       verbose: bool = False,
+                                       ) -> List[int]:
+    """
+    1. compute info-interaction between probe, left-word, and right-word probability distributions
+    2. re-order partitions from low to high.
+    """
+    # calc H(Y) for each part
+    iis = []
+    for part in prep.reordered_parts:
+        # windows
+        token_ids_array = part.astype(np.int64)
+        num_possible_windows = len(token_ids_array) - prep.num_tokens_in_window
+        shape = (num_possible_windows, prep.num_tokens_in_window)
+        windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
+
+        # windows with probe in position -2
+        row_ids = np.isin(windows[:, -2], [prep.store.w2id[w] for w in probes])
+        probe_windows = windows[row_ids]
+
+        # info interaction
+        x = probe_windows[:, -3:].T  # 3 rows, where each row contains realisations of a distinct random variable
+        iis.append(drv.information_interaction(x))
+
+    if verbose:
+        print([round(je, 2) for je in iis])
+
+    # get indices that sort ii from low to high
+    res = list(sorted(range(prep.num_parts), key=lambda i: iis[i], reverse=False))
+    return res
