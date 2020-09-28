@@ -10,10 +10,11 @@ from categoryeval.probestore import ProbeStore
 
 from ordermatters import configs
 
-CORPUS_NAME = 'childes-20191206'
+CORPUS_NAME = 'newsela'
+# CORPUS_NAME = 'childes-20191206'
 PROBES_NAME = 'sem-4096'
 NUM_TICKS = 2
-NUM_TYPES = 4096
+NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
 REMOVE_SYMBOLS = None
 
 corpus_path = configs.Dirs.corpora / f'{CORPUS_NAME}.txt'
@@ -24,7 +25,7 @@ prep = PartitionedPrep(train_docs,
                        reverse=False,
                        num_types=NUM_TYPES,
                        num_parts=2,
-                       num_iterations=[20, 20],
+                       num_iterations=(20, 20),
                        batch_size=64,
                        context_size=7,
                        )
@@ -40,10 +41,10 @@ shape = (num_possible_windows, prep.num_tokens_in_window)
 windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
 print(f'Matrix containing all windows has shape={windows.shape}')
 
-# TODO the question: are teh two methods equivalent: 1. nouns are binary, 2. nouns are not binary
+# TODO the question: are the two methods equivalent: 1. nouns are binary, 2. nouns are not binary
 
 ###############
-# METHOD 2: use all windows, and make noun observations binary
+# METHOD 1: use all windows, and make noun observations binary
 ###############
 
 x1, x2 = np.array_split(windows[:, -2], 2, axis=0)  # CAT member

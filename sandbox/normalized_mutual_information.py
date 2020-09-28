@@ -21,7 +21,7 @@ from ordermatters import configs
 CORPUS_NAME = 'childes-20191206'
 PROBES_NAME = 'sem-4096'
 NUM_TICKS = 32
-NUM_TYPES = 4096
+NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
 DISTANCE = -2  # can be negative or positive
 NORM_FACTOR = 'XY'
 
@@ -89,7 +89,7 @@ plt.title(f'x={DISTANCE}\ny={PROBES_NAME}\nnorm={NORM_FACTOR}'
           f'\n(Nouns are NOT binary outcomes)',
           fontsize=fontsize)
 ax.set_ylabel('Cumulative Normalized Mutual Info', fontsize=fontsize)
-ax.set_xlabel('Location in AO-CHILDES [num tokens]', fontsize=fontsize)
+ax.set_xlabel(f'Location in {CORPUS_NAME} [num tokens]', fontsize=fontsize)
 ax.spines['right'].set_visible(False)
 ax.spines['top'].set_visible(False)
 ax.set_xticks(x_ticks)

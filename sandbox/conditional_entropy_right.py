@@ -24,7 +24,7 @@ from ordermatters.figs import add_double_legend
 CORPUS_NAME = 'childes-20191206'
 WORDS_NAME = 'nouns-2972'
 NUM_TICKS = 2
-NUM_TYPES = 4096
+NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
 
 corpus_path = configs.Dirs.corpora / f'{CORPUS_NAME}.txt'
 train_docs, _ = load_docs(corpus_path)
@@ -33,7 +33,7 @@ prep = PartitionedPrep(train_docs,
                        reverse=False,
                        num_types=NUM_TYPES,
                        num_parts=2,
-                       num_iterations=[20, 20],
+                       num_iterations=(20, 20),
                        batch_size=64,
                        context_size=7,
                        )
@@ -100,7 +100,7 @@ fig, ax = plt.subplots(1, figsize=(6, 4), dpi=163)
 fontsize = 14
 plt.title(f'Cumulative uncertainty about {WORDS_NAME}s\ngiven right-adjacent word', fontsize=fontsize)
 ax.set_ylabel('Entropy [bits]', fontsize=fontsize)
-ax.set_xlabel('Location in AO-CHILDES [num tokens]', fontsize=fontsize)
+ax.set_xlabel(f'Location in {CORPUS_NAME} [num tokens]', fontsize=fontsize)
 ax.spines['right'].set_visible(False)
 ax.spines['top'].set_visible(False)
 ax.set_xticks(num_windows_list)

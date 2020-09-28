@@ -11,7 +11,7 @@ from ordermatters.figs import make_example_fig
 
 CORPUS_NAME = 'childes-20191206'
 PROBES_NAME = 'sem-4096'
-NUM_TYPES = 4096
+NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
 REMOVE_SYMBOLS = None
 NUM_ROWS = 512
 
@@ -23,7 +23,7 @@ prep = PartitionedPrep(train_docs,
                        reverse=False,
                        num_types=NUM_TYPES,
                        num_parts=2,
-                       num_iterations=[20, 20],
+                       num_iterations=(20, 20),
                        batch_size=64,
                        context_size=7,
                        )

@@ -19,11 +19,12 @@ from categoryeval.probestore import ProbeStore
 from ordermatters import configs
 from ordermatters.figs import add_double_legend
 
-CORPUS_NAME = 'childes-20191206'
+CORPUS_NAME = 'newsela'
+# CORPUS_NAME = 'childes-20191206'
 PROBES_NAME = 'sem-4096'
 NUM_TICKS = 32
-NUM_TYPES = 4096
-DISTANCE = 4
+NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
+DISTANCE = 1
 
 corpus_path = configs.Dirs.corpora / f'{CORPUS_NAME}.txt'
 train_docs, _ = load_docs(corpus_path)
@@ -96,7 +97,7 @@ plt.title(f'Cumulative uncertainty about {PROBES_NAME} given left-word'
           f'\n(Nouns are NOT binary outcomes)'
           f'\ndistance={DISTANCE}', fontsize=fontsize)
 ax.set_ylabel('Entropy [bits]', fontsize=fontsize)
-ax.set_xlabel('Location in AO-CHILDES [num tokens]', fontsize=fontsize)
+ax.set_xlabel(f'Location in {CORPUS_NAME} [num tokens]', fontsize=fontsize)
 ax.spines['right'].set_visible(False)
 ax.spines['top'].set_visible(False)
 ax.set_xticks(num_windows_list)

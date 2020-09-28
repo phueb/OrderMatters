@@ -23,7 +23,7 @@ prep = PartitionedPrep(tc.docs,
                        reverse=False,
                        num_types=NUM_TYPES,
                        num_parts=NUM_PARTS,
-                       num_iterations=[1, 1],
+                       num_iterations=(1, 1),
                        batch_size=64,
                        context_size=1)
 

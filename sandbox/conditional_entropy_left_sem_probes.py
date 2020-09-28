@@ -1,6 +1,6 @@
 """
 Research question:
-Given that it is known whether a word is a noun or not (picking from binary distribution),
+Given that it is known whether a word is a probe or not (picking from binary distribution),
 how much uncertainty remains about the previous word?
 
 the uncertainty should be lower in partition 1 of AO-CHILDES
@@ -19,10 +19,11 @@ from categoryeval.probestore import ProbeStore
 from ordermatters import configs
 from ordermatters.figs import add_double_legend
 
+# CORPUS_NAME = 'newsela'
 CORPUS_NAME = 'childes-20191206'
 PROBES_NAME = 'sem-4096'
 NUM_TICKS = 4
-NUM_TYPES = 4096
+NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
 
 corpus_path = configs.Dirs.corpora / f'{CORPUS_NAME}.txt'
 train_docs, _ = load_docs(corpus_path)
@@ -31,7 +32,7 @@ prep = PartitionedPrep(train_docs,
                        reverse=False,
                        num_types=NUM_TYPES,
                        num_parts=2,
-                       num_iterations=[20, 20],
+                       num_iterations=(20, 20),
                        batch_size=64,
                        context_size=7,
                        )
@@ -90,14 +91,14 @@ ce2, je2 = collect_data(windows, reverse=True)
 # fig
 fig, ax = plt.subplots(1, figsize=(6, 4), dpi=163)
 fontsize = 14
-plt.title(f'Cumulative uncertainty about words left-adjacent to {POS}s', fontsize=fontsize)
+plt.title(f'Cumulative uncertainty about words left-adjacent to\n{PROBES_NAME}', fontsize=fontsize)
 ax.set_ylabel('Entropy [bits]', fontsize=fontsize)
-ax.set_xlabel('Location in AO-CHILDES [num tokens]', fontsize=fontsize)
+ax.set_xlabel(f'Location in {CORPUS_NAME} [num tokens]', fontsize=fontsize)
 ax.spines['right'].set_visible(False)
 ax.spines['top'].set_visible(False)
 ax.set_xticks(num_windows_list)
 ax.set_xticklabels(num_windows_list)
-ax.set_ylim([7.0, 8.0])
+# ax.set_ylim([8.0, 9.0])
 # plot conditional entropy
 l1, = ax.plot(num_windows_list, ce1, '-', linewidth=2, color='C0')
 l2, = ax.plot(num_windows_list, ce2, '-', linewidth=2, color='C1')
