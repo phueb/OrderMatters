@@ -109,6 +109,35 @@ def reorder_by_y_entropy(prep: PartitionedPrep,
     return res
 
 
+def reorder_by_unconditional_entropy(prep: PartitionedPrep,
+                                     probes: List[str],
+                                     verbose: bool = False,
+                                     ) -> List[int]:
+    """
+    1. compute entropy of all words in a part
+    2. re-order partitions from low to high entropy.
+    """
+    # calc H(Y) for each part
+    yes = []
+    for part in prep.reordered_parts:
+        # windows
+        token_ids_array = part.astype(np.int64)
+        num_possible_windows = len(token_ids_array) - prep.num_tokens_in_window
+        shape = (num_possible_windows, prep.num_tokens_in_window)
+        windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
+
+        # entropy of all windows
+        y = windows[:, -1]
+        yes.append(drv.entropy_joint(y).item())
+
+    if verbose:
+        print([round(je, 2) for je in yes])
+
+    # get indices that sort Y entropies from low to high
+    res = list(sorted(range(prep.num_parts), key=lambda i: yes[i], reverse=False))
+    return res
+
+
 def reorder_by_information_interaction(prep: PartitionedPrep,
                                        probes: List[str],
                                        verbose: bool = False,
