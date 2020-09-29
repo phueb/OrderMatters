@@ -8,7 +8,7 @@ from preppy import PartitionedPrep
 
 
 def reorder_by_conditional_entropy(prep: PartitionedPrep,
-                                   probes: List[str],
+                                   test_words: List[str],
                                    verbose: bool = False,
                                    ) -> List[int]:
     """
@@ -25,7 +25,7 @@ def reorder_by_conditional_entropy(prep: PartitionedPrep,
         windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
 
         # windows with probe in position -2
-        row_ids = np.isin(windows[:, -2], [prep.store.w2id[w] for w in probes])
+        row_ids = np.isin(windows[:, -2], test_word_ids)
         probe_windows = windows[row_ids]
 
         # conditional entropy
@@ -42,7 +42,7 @@ def reorder_by_conditional_entropy(prep: PartitionedPrep,
 
 
 def reorder_by_joint_entropy(prep: PartitionedPrep,
-                             probes: List[str],
+                             test_words: List[str],
                              verbose: bool = False,
                              ) -> List[int]:
     """
@@ -59,7 +59,7 @@ def reorder_by_joint_entropy(prep: PartitionedPrep,
         windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
 
         # windows with probe in position -2
-        row_ids = np.isin(windows[:, -2], [prep.store.w2id[w] for w in probes])
+        row_ids = np.isin(windows[:, -2], test_word_ids)
         probe_windows = windows[row_ids]
 
         # joint entropy
@@ -77,7 +77,7 @@ def reorder_by_joint_entropy(prep: PartitionedPrep,
 
 
 def reorder_by_y_entropy(prep: PartitionedPrep,
-                         probes: List[str],
+                         test_words: List[str],
                          verbose: bool = False,
                          ) -> List[int]:
     """
@@ -94,7 +94,7 @@ def reorder_by_y_entropy(prep: PartitionedPrep,
         windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
 
         # windows with probe in position -2
-        row_ids = np.isin(windows[:, -2], [prep.store.w2id[w] for w in probes])
+        row_ids = np.isin(windows[:, -2], test_word_ids)
         probe_windows = windows[row_ids]
 
         # entropy of Y
@@ -110,7 +110,7 @@ def reorder_by_y_entropy(prep: PartitionedPrep,
 
 
 def reorder_by_unconditional_entropy(prep: PartitionedPrep,
-                                     probes: List[str],
+                                     test_words: List[str],
                                      verbose: bool = False,
                                      ) -> List[int]:
     """
@@ -139,7 +139,7 @@ def reorder_by_unconditional_entropy(prep: PartitionedPrep,
 
 
 def reorder_by_information_interaction(prep: PartitionedPrep,
-                                       probes: List[str],
+                                       test_words: List[str],
                                        verbose: bool = False,
                                        ) -> List[int]:
     """
@@ -156,7 +156,7 @@ def reorder_by_information_interaction(prep: PartitionedPrep,
         windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
 
         # windows with probe in position -2
-        row_ids = np.isin(windows[:, -2], [prep.store.w2id[w] for w in probes])
+        row_ids = np.isin(windows[:, -2], test_word_ids)
         probe_windows = windows[row_ids]
 
         # info interaction

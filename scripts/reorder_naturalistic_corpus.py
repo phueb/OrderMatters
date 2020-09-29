@@ -16,10 +16,10 @@ CORPUS_NAME = 'newsela'
 REMOVE_NUMBER_WORDS = True  # this is important
 NUM_SKIP_FIRST_DOCS = 0
 
-# PROBES_NAME = 'verbs-1321'
-# PROBES_NAME = 'nouns-2972'
-PROBES_NAME = 'sem-4096'
-# PROBES_NAME = 'adjs-498'
+# WORDS_NAME = 'verbs-1321'
+# WORDS_NAME = 'nouns-2972'
+WORDS_NAME = 'sem-4096'
+# WORDS_NAME = 'adjs-498'
 
 corpus_path = configs.Dirs.corpora / f'{CORPUS_NAME}.txt'
 docs, _ = load_docs(corpus_path, num_test_docs=0)
@@ -32,25 +32,25 @@ prep = PartitionedPrep(docs[NUM_SKIP_FIRST_DOCS:],
                        context_size=1)
 
 # load a category of words, X, for which to compute conditional entropy, H(X|Y)
-probes_file_path = configs.Dirs.words / f'{CORPUS_NAME}-{PROBES_NAME}.txt'
-probes = [w for w in probes_file_path.read_text().split('\n') if w in prep.store.w2id]
-print('num probes', len(probes))
+test_words_file_path = configs.Dirs.words / f'{CORPUS_NAME}-{WORDS_NAME}.txt'
+test_words = [w for w in test_words_file_path.read_text().split('\n') if w in prep.store.w2id]
+print('num test_words', len(test_words))
 
 if REMOVE_NUMBER_WORDS:  # number words are not nouns
     number_words_file_path = configs.Dirs.words / f'{CORPUS_NAME}-numbers.txt'
     for number in [w for w in number_words_file_path.read_text().split('\n')]:
-        if number in probes:
-            probes.remove(number)
+        if number in test_words:
+            test_words.remove(number)
             print('Removed', number)
 
 
 # input to spearman correlation
 ordered_part_ids = [n for n in range(prep.num_parts)]
-reordered_part_ids_ce = reorder_by_conditional_entropy(prep, probes)
-reordered_part_ids_je = reorder_by_joint_entropy(prep, probes)
-reordered_part_ids_ye = reorder_by_y_entropy(prep, probes)
-reordered_part_ids_ue = reorder_by_unconditional_entropy(prep, probes)
-reordered_part_ids_ii = reorder_by_information_interaction(prep, probes)
+reordered_part_ids_ce = reorder_by_conditional_entropy(prep, test_words)
+reordered_part_ids_je = reorder_by_joint_entropy(prep, test_words)
+reordered_part_ids_ye = reorder_by_y_entropy(prep, test_words)
+reordered_part_ids_ue = reorder_by_unconditional_entropy(prep, test_words)
+reordered_part_ids_ii = reorder_by_information_interaction(prep, test_words)
 
 print('ordering by decreasing conditional entropy:')
 rho, p_value = spearmanr(ordered_part_ids, reordered_part_ids_ce)

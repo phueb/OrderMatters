@@ -46,7 +46,7 @@ def collect_data(windows, reverse: bool):
         print(f'{num_windows:>12,}/{x_ticks[-1]:>12,}')
 
         # probe windows
-        row_ids = np.isin(ws[:, -2], [prep.store.w2id[w] for w in probes])
+        row_ids = np.isin(ws[:, -2], test_word_ids)
         probe_windows = ws[row_ids]
 
         # conditional entropy, joint entropy, y entropy
@@ -77,8 +77,8 @@ prep = PartitionedPrep(train_docs,
 
 
 words_file_path = configs.Dirs.words / f'{CORPUS_NAME}-{WORDS_NAME}.txt'
-probes = set([w for w in words_file_path.read_text().split('\n') if w in prep.store.w2id])
-print(f'num probes={len(probes)}')
+test_words = set([w for w in words_file_path.read_text().split('\n') if w in prep.store.w2id])
+print(f'num test_words={len(test_words)}')
 
 # windows
 token_ids_array = np.array(prep.store.token_ids, dtype=np.int64)

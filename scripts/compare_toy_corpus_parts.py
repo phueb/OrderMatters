@@ -30,7 +30,7 @@ prep = PartitionedPrep(tc.docs,
                        num_iterations=(1, 1),
                        batch_size=64,
                        context_size=1)
-probes = [p for p in tc.nouns if p in prep.store.w2id]
+test_words = [p for p in tc.nouns if p in prep.store.w2id]
 
 s_list = []
 num_sv = 8
@@ -43,7 +43,7 @@ for part_id, part in enumerate(prep.reordered_parts):
     windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
 
     # windows with probe in position -2
-    row_ids = np.isin(windows[:, -2], [prep.store.w2id[w] for w in probes])
+    row_ids = np.isin(windows[:, -2], test_word_ids)
     probe_windows = windows[row_ids]
 
     # conditional entropy
@@ -51,7 +51,7 @@ for part_id, part in enumerate(prep.reordered_parts):
     y = probe_windows[:, -1]  # next-word
     x_y = np.vstack((x, y))   # joint outcome
 
-    # map word ID of nouns to IDs between [0, len(probes)]
+    # map word ID of nouns to IDs between [0, len(test_words)]
     # this makes creating a matrix with the right number of columns easier
     x2x = {xi: n for n, xi in enumerate(np.unique(x))}
 

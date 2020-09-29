@@ -4,13 +4,13 @@ import matplotlib.pyplot as plt
 
 from preppy import PartitionedPrep
 from preppy.docs import load_docs
-from categoryeval.probestore import ProbeStore
+
 
 from ordermatters import configs
 from ordermatters.figs import make_example_fig
 
 CORPUS_NAME = 'childes-20191206'
-PROBES_NAME = 'sem-4096'
+WORDS_NAME = 'sem-4096'
 NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
 REMOVE_SYMBOLS = None
 NUM_ROWS = 512
@@ -28,8 +28,9 @@ prep = PartitionedPrep(train_docs,
                        context_size=7,
                        )
 
-store = ProbeStore(CORPUS_NAME, PROBES_NAME, prep.store.w2id)
-probes = store.types
+test_words = (configs.Dirs.words / f'{CORPUS_NAME}-{WORDS_NAME}.txt').open().read().split("\n")
+test_word_ids = [prep.store.w2id[w] for w in test_words if w in prep.store.w2id]  # must not be  a set
+print(f'Including {len(test_word_ids)} out of {len(test_words)} test_words in file')
 
 # windows
 token_ids_array = np.array(prep.store.token_ids, dtype=np.int64)
@@ -38,13 +39,13 @@ shape = (num_possible_windows, prep.num_tokens_in_window)
 windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
 
 # probe windows
-row_ids = np.isin(windows[:, -2], [prep.store.w2id[w] for w in probes])
+row_ids = np.isin(windows[:, -2], test_word_ids)
 probe_windows = windows[row_ids]
 
 x_actual = probe_windows[:, -2]  # CAT member
 y_actual = probe_windows[:, -1]  # next-word
 
-# map word ID of nouns to IDs between [0, len(probes)]
+# map word ID of nouns to IDs between [0, len(test_words)]
 # this makes creating a matrix with the right number of columns easier
 x2x = {x: n for n, x in enumerate(np.unique(x_actual))}
 

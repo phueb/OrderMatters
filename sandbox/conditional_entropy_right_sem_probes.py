@@ -1,11 +1,11 @@
 """
 Research question:
 is the connection between a probe's next word P less lexically specific (higher conditional entropy) in p1 vs p2?
-if so, this would support the idea that probes are learned more abstractly/flexibly in p1.
+if so, this would support the idea that test_words are learned more abstractly/flexibly in p1.
 
 conditional entropy (x|y) = how much more information I need to figure out what X is when Y is known.
 
-so if y is the probability distribution of next-words, and x is P over probes,
+so if y is the probability distribution of next-words, and x is P over test_words,
  the hypothesis is that conditional entropy is higher in partition 1 vs. 2
 
 """
@@ -17,14 +17,14 @@ import matplotlib.pyplot as plt
 
 from preppy import PartitionedPrep
 from preppy.docs import load_docs
-from categoryeval.probestore import ProbeStore
+
 
 from ordermatters import configs
 from ordermatters.figs import add_double_legend
 
 # CORPUS_NAME = 'newsela'
 CORPUS_NAME = 'childes-20191206'
-PROBES_NAME = 'sem-4096'
+WORDS_NAME = 'sem-4096'
 NUM_TICKS = 32
 NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
 
@@ -40,9 +40,9 @@ prep = PartitionedPrep(train_docs,
                        context_size=7,
                        )
 
-store = ProbeStore(CORPUS_NAME, PROBES_NAME, prep.store.w2id)
-probes = store.types
-print(f'num probes={len(probes)}')
+test_words = (configs.Dirs.words / f'{CORPUS_NAME}-{WORDS_NAME}.txt').open().read().split("\n")
+test_word_ids = [prep.store.w2id[w] for w in test_words if w in prep.store.w2id]  # must not be  a set
+print(f'Including {len(test_word_ids)} out of {len(test_words)} test_words in file')
 
 # windows
 token_ids_array = np.array(prep.store.token_ids, dtype=np.int64)
@@ -51,8 +51,8 @@ shape = (num_possible_windows, prep.num_tokens_in_window)
 windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
 print(f'Matrix containing all windows has shape={windows.shape}')
 
-num_windows_list = [int(i) for i in np.linspace(0, len(windows), NUM_TICKS + 1)][1:]
-print(num_windows_list)
+x_ticks = [int(i) for i in np.linspace(0, len(windows), NUM_TICKS + 1)][1:]
+print(x_ticks)
 
 
 def collect_data(windows, reverse: bool):
@@ -63,13 +63,13 @@ def collect_data(windows, reverse: bool):
     ce = []
     je = []
     ye = []
-    for num_windows in num_windows_list:
+    for num_windows in x_ticks:
 
         ws = windows[:num_windows]
         print(num_windows, ws.shape)
 
         # probe windows
-        row_ids = np.isin(ws[:, -2], [prep.store.w2id[w] for w in probes])
+        row_ids = np.isin(ws[:, -2], test_word_ids)
         probe_windows = ws[row_ids]
         print(f'num probe windows={len(probe_windows)}')
 
@@ -100,23 +100,23 @@ ce2, je2, ye2 = collect_data(windows, reverse=True)
 # fig
 fig, ax = plt.subplots(1, figsize=(6, 4), dpi=163)
 fontsize = 14
-plt.title(f'Cumulative uncertainty about {PROBES_NAME} words\ngiven right-adjacent word', fontsize=fontsize)
+plt.title(f'Cumulative uncertainty about {WORDS_NAME} words\ngiven right-adjacent word', fontsize=fontsize)
 ax.set_ylabel('Entropy [bits]', fontsize=fontsize)
 ax.set_xlabel(f'Location in {CORPUS_NAME} [num tokens]', fontsize=fontsize)
 ax.spines['right'].set_visible(False)
 ax.spines['top'].set_visible(False)
-ax.set_xticks(num_windows_list)
-ax.set_xticklabels(['' if n + 1 != len(num_windows_list) else i for n, i in enumerate(num_windows_list)])
+ax.set_xticks(x_ticks)
+ax.set_xticklabels(['' if n + 1 != len(x_ticks) else i for n, i in enumerate(x_ticks)])
 # ax.set_ylim([7.0, 8.0])
 # plot conditional entropy
-l1, = ax.plot(num_windows_list, ce1, '-', linewidth=2, color='C0')
-l2, = ax.plot(num_windows_list, ce2, '-', linewidth=2, color='C1')
+l1, = ax.plot(x_ticks, ce1, '-', linewidth=2, color='C0')
+l2, = ax.plot(x_ticks, ce2, '-', linewidth=2, color='C1')
 # plot joint entropy
-l3, = ax.plot(num_windows_list, je1, ':', linewidth=2, color='C0')
-l4, = ax.plot(num_windows_list, je2, ':', linewidth=2, color='C1')
+l3, = ax.plot(x_ticks, je1, ':', linewidth=2, color='C0')
+l4, = ax.plot(x_ticks, je2, ':', linewidth=2, color='C1')
 # plot joint entropy
-l5, = ax.plot(num_windows_list, ye1, '--', linewidth=2, color='C0')
-l6, = ax.plot(num_windows_list, ye2, '--', linewidth=2, color='C1')
+l5, = ax.plot(x_ticks, ye1, '--', linewidth=2, color='C0')
+l6, = ax.plot(x_ticks, ye2, '--', linewidth=2, color='C1')
 
 
 lines_list = [[l1, l3, l5], [l2, l4, l6]]
