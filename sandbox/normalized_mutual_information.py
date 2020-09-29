@@ -1,9 +1,6 @@
 """
 Research question:
-Given that the particular outcome of the noun is known in noun windows,
-how much uncertainty remains in predicting a noun given its left context?
-
-the uncertainty should be HIGHER in partition 1 of AO-CHILDES
+Is mutual information between a probe and a neighbor higher in partition 1 of AO-CHILDES?
 
 """
 
@@ -18,13 +15,15 @@ from categoryeval.probestore import ProbeStore
 
 from ordermatters import configs
 
-CORPUS_NAME = 'newsela'
-# CORPUS_NAME = 'childes-20191206'
+# CORPUS_NAME = 'newsela'
+CORPUS_NAME = 'childes-20191206'
 PROBES_NAME = 'sem-4096'
 NUM_TICKS = 32
 NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
-DISTANCE = -2  # can be negative or positive
+DISTANCE = -1  # can be negative or positive
 NORM_FACTOR = 'XY'
+
+Y_LIMS = [0.10, 0.35]
 
 
 def collect_data(windows_mat, reverse: bool):
@@ -44,8 +43,8 @@ def collect_data(windows_mat, reverse: bool):
 
         # mutual info
         assert DISTANCE <= 1
-        x = probe_windows[:, -2 + DISTANCE]  # left or right context
-        y = probe_windows[:, -2]  # probe
+        x = probe_windows[:, -2]  # probe
+        y = probe_windows[:, -2 + DISTANCE]  # left or right context
         mi = drv.information_mutual_normalised(x, y, norm_factor=NORM_FACTOR)
 
         res.append(mi)
@@ -76,10 +75,8 @@ shape = (num_possible_windows, prep.num_tokens_in_window)
 windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
 print(f'Matrix containing all windows has shape={windows.shape}')
 
-x_ticks = [int(i) for i in np.linspace(0, len(windows), NUM_TICKS + 1)][1:]
-
-
 # collect data
+x_ticks = [int(i) for i in np.linspace(0, len(windows), NUM_TICKS + 1)][1:]
 mi1 = collect_data(windows, reverse=False)
 mi2 = collect_data(windows, reverse=True)
 
@@ -89,12 +86,14 @@ fontsize = 12
 plt.title(f'x={DISTANCE}\ny={PROBES_NAME}\nnorm={NORM_FACTOR}'
           f'\n(Nouns are NOT binary outcomes)',
           fontsize=fontsize)
-ax.set_ylabel('Cumulative Normalized Mutual Info', fontsize=fontsize)
+ax.set_ylabel('Normalized Mutual Info', fontsize=fontsize)
 ax.set_xlabel(f'Location in {CORPUS_NAME} [num tokens]', fontsize=fontsize)
 ax.spines['right'].set_visible(False)
 ax.spines['top'].set_visible(False)
 ax.set_xticks(x_ticks)
 ax.set_xticklabels([i if n in [0, len(x_ticks) - 1] else '' for n, i in enumerate(x_ticks)])
+if Y_LIMS:
+    ax.set_ylim(Y_LIMS)
 # plot
 ax.plot(x_ticks, mi1, '-', linewidth=2, color='C0', label='age ordered')
 ax.plot(x_ticks, mi2, '-', linewidth=2, color='C1', label='reverse age ordered')

@@ -11,8 +11,8 @@ from ordermatters.reorder import reorder_by_unconditional_entropy
 from ordermatters.reorder import reorder_by_information_interaction
 
 NUM_PARTS = 32
-# CORPUS_NAME = 'newsela'
-CORPUS_NAME = 'childes-20191206'
+CORPUS_NAME = 'newsela'
+# CORPUS_NAME = 'childes-20191206'
 REMOVE_NUMBER_WORDS = True  # this is important
 NUM_SKIP_FIRST_DOCS = 0
 
