@@ -13,7 +13,6 @@ from ordermatters import configs
 CORPUS_NAME = 'newsela'
 # CORPUS_NAME = 'childes-20191206'
 WORDS_NAME = 'sem-4096'
-NUM_TICKS = 2
 NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
 REMOVE_SYMBOLS = None
 

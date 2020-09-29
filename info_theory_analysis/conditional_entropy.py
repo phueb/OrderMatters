@@ -19,14 +19,13 @@ from preppy import PartitionedPrep
 from preppy.docs import load_docs
 
 from ordermatters import configs
-from ordermatters.figs import add_double_legend
+from ordermatters.figs import make_info_theory_fig
 
 # CORPUS_NAME = 'childes-20191206'
 CORPUS_NAME = 'newsela'
 # WORDS_NAME = 'nouns-2972'
 WORDS_NAME = 'numbers'
 DISTANCE = -1
-NUM_TICKS = 32
 NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
 
 Y_LIMS = None
@@ -76,9 +75,10 @@ prep = PartitionedPrep(train_docs,
                        )
 
 
-words_file_path = configs.Dirs.words / f'{CORPUS_NAME}-{WORDS_NAME}.txt'
-test_words = set([w for w in words_file_path.read_text().split('\n') if w in prep.store.w2id])
-print(f'num test_words={len(test_words)}')
+# load test words
+test_words = (configs.Dirs.words / f'{CORPUS_NAME}-{WORDS_NAME}.txt').open().read().split("\n")
+test_word_ids = [prep.store.w2id[w] for w in test_words if w in prep.store.w2id]  # must not be  a set
+print(f'Including {len(test_word_ids)} out of {len(test_words)} test_words in file')
 
 # windows
 token_ids_array = np.array(prep.store.token_ids, dtype=np.int64)
@@ -88,39 +88,26 @@ windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
 print(f'Matrix containing all windows has shape={windows.shape}')
 
 # collect data
-x_ticks = [int(i) for i in np.linspace(0, len(windows), NUM_TICKS + 1)][1:]
+x_ticks = [int(i) for i in np.linspace(0, len(windows), configs.Constants.num_ticks + 1)][1:]
 ce1, je1, ye1 = collect_data(windows, reverse=False)
 ce2, je2, ye2 = collect_data(windows, reverse=True)
 
 # fig
-fig, ax = plt.subplots(1, figsize=(6, 4), dpi=163)
-fontsize = 12
-plt.title(f'Cumulative uncertainty about {WORDS_NAME} words\n'
-          f'given neighbor at distance={DISTANCE}', fontsize=fontsize)
-ax.set_ylabel('Entropy [bits]', fontsize=fontsize)
-ax.set_xlabel(f'Location in {CORPUS_NAME} [num tokens]', fontsize=fontsize)
-ax.spines['right'].set_visible(False)
-ax.spines['top'].set_visible(False)
-ax.set_xticks(x_ticks)
-ax.set_xticklabels(['' if n + 1 != len(x_ticks) else i for n, i in enumerate(x_ticks)])
-if Y_LIMS:
-    ax.set_ylim(Y_LIMS)
-# plot conditional entropy
-l1, = ax.plot(x_ticks, ce1, '-', linewidth=2, color='C0')
-l2, = ax.plot(x_ticks, ce2, '-', linewidth=2, color='C1')
-# plot joint entropy
-l3, = ax.plot(x_ticks, je1, ':', linewidth=2, color='C0')
-l4, = ax.plot(x_ticks, je2, ':', linewidth=2, color='C1')
-# plot joint entropy
-l5, = ax.plot(x_ticks, ye1, '--', linewidth=2, color='C0')
-l6, = ax.plot(x_ticks, ye2, '--', linewidth=2, color='C1')
-
-
-lines_list = [[l1, l3, l5], [l2, l4, l6]]
+title = f'Cumulative uncertainty about {WORDS_NAME} words\n' \
+        f'given neighbor at distance={DISTANCE}'
+x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
+y_axis_label = 'Entropy [bits]'
 labels1 = ['H(X|Y)', 'H(X,Y)', 'H(Y)']
 labels2 = ['age-ordered', 'reverse age-ordered']
-add_double_legend(lines_list, labels1, labels2)
-
+fig, ax = make_info_theory_fig([[ce1, ce2], [je1, je2], [ye1, ye2]],
+                               title,
+                               x_axis_label,
+                               y_axis_label,
+                               x_ticks,
+                               labels1,
+                               labels2,
+                               y_lims=Y_LIMS,
+                               )
 plt.show()
 
 

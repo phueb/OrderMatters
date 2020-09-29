@@ -14,12 +14,12 @@ from preppy.docs import load_docs
 
 
 from ordermatters import configs
+from ordermatters.figs import make_info_theory_fig
 
 CORPUS_NAME = 'newsela'
 # CORPUS_NAME = 'childes-20191206'
 # WORDS_NAME = 'sem-4096'
 WORDS_NAME = 'numbers'
-NUM_TICKS = 32
 NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
 DISTANCE = -1  # can be negative or positive
 NORM_FACTOR = 'XY'
@@ -74,7 +74,7 @@ token_ids_array = np.array(prep.store.token_ids, dtype=np.int64)
 num_possible_windows = len(token_ids_array) - prep.num_tokens_in_window
 shape = (num_possible_windows, prep.num_tokens_in_window)
 windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
-x_ticks = [int(i) for i in np.linspace(0, len(windows), NUM_TICKS + 1)][1:]
+x_ticks = [int(i) for i in np.linspace(0, len(windows), configs.Constants.num_ticks + 1)][1:]
 print(f'Matrix containing all windows has shape={windows.shape}')
 
 # collect data
@@ -82,21 +82,19 @@ mi1 = collect_data(windows, reverse=False)
 mi2 = collect_data(windows, reverse=True)
 
 # fig
-fig, ax = plt.subplots(1, figsize=(6, 5), dpi=163)
-fontsize = 12
-plt.title(f'x={DISTANCE}\ny={WORDS_NAME}\nnorm={NORM_FACTOR}'
-          f'\n(Nouns are NOT binary outcomes)',
-          fontsize=fontsize)
-ax.set_ylabel('Normalized Mutual Info', fontsize=fontsize)
-ax.set_xlabel(f'Location in {CORPUS_NAME} [num tokens]', fontsize=fontsize)
-ax.spines['right'].set_visible(False)
-ax.spines['top'].set_visible(False)
-ax.set_xticks(x_ticks)
-ax.set_xticklabels([i if n in [0, len(x_ticks) - 1] else '' for n, i in enumerate(x_ticks)])
-if Y_LIMS:
-    ax.set_ylim(Y_LIMS)
-# plot
-ax.plot(x_ticks, mi1, '-', linewidth=2, color='C0', label='age ordered')
-ax.plot(x_ticks, mi2, '-', linewidth=2, color='C1', label='reverse age ordered')
-plt.legend(frameon=False)
+title = f'x={DISTANCE}\ny={WORDS_NAME}\nnorm={NORM_FACTOR}\n' \
+        f'(Nouns are NOT binary outcomes)'
+x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
+y_axis_label = 'Normalized Mutual Info'
+labels1 = ['I(X;Y)']
+labels2 = ['age-ordered', 'reverse age-ordered']
+fig, ax = make_info_theory_fig([[mi1, mi2]],
+                               title,
+                               x_axis_label,
+                               y_axis_label,
+                               x_ticks,
+                               labels1,
+                               labels2,
+                               y_lims=Y_LIMS,
+                               )
 plt.show()
