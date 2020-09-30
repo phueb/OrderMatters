@@ -56,10 +56,12 @@ def make_info_theory_fig(data: List[List[List[float]]],
         ax.set_ylim(y_lims)
 
     # plot
+    ls = iter(['-', '--', ':'])
     lines = [[], []]  # 1 list for age-ordered and 1 for age-reversed
     for ys in data:
+        lsi = next(ls)
         for n, y in enumerate(ys):
-            line, = ax.plot(x_ticks, y, '-', linewidth=2, color=f'C{n}')
+            line, = ax.plot(x_ticks, y, lsi, linewidth=2, color=f'C{n}')
             lines[n].append(line)
 
     # legend

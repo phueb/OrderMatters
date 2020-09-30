@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from preppy import PartitionedPrep
 
 from ordermatters.figs import make_example_fig
-from ordermatters.toy_corpus import ToyCorpus
+from ordermatters.corpus_toy import ToyCorpus
 from ordermatters.figs import plot_singular_values
 
 NUM_DOCS = 2

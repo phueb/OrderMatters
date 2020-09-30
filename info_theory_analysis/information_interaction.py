@@ -5,96 +5,68 @@ of how probe words are redundant with their neighbors.
 
 """
 
-
-from numpy.lib.stride_tricks import as_strided
 import numpy as np
-import matplotlib.pyplot as plt
+from multiprocessing import Pool
+from typing import List, Tuple
 from pyitlib import discrete_random_variable as drv
-from typing import List
+import matplotlib.pyplot as plt
 
-from preppy import PartitionedPrep
-from preppy.docs import load_docs
-
-
-from ordermatters.figs import make_info_theory_fig
 from ordermatters import configs
+from ordermatters.figs import make_info_theory_fig
+from ordermatters.utils import make_prep, make_windows, make_test_words
 
-CORPUS_NAME = 'newsela'
-# CORPUS_NAME = 'childes-20191206'
-# WORDS_NAME = 'nouns-copied-from-childes'
-# WORDS_NAME = 'nouns-2972'
+# CORPUS_NAME = 'newsela'
+CORPUS_NAME = 'childes-20191206'
 WORDS_NAME = 'sem-4096'
-# WORDS_NAME = 'numbers'
-NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
+DISTANCE = + 1
 REMOVE_SYMBOLS = None
-DISTANCE = 2  # half of bidirectional window, excluding probe
+REMOVE_NUMBERS = False
 
-Y_LIMS = [0.5, 3.0]  # [-0.5, 0.8]  # [0.8, 3.8]  # [0.5, 1.6]  # [0.0, 3.0]
-
-
-def collect_data(windows_mat, reverse: bool) -> List[float]:
-
-    if reverse:
-        windows_mat = np.flip(windows_mat, 0)
-
-    ii = []
-    for num_windows in x_ticks:
-
-        ws = windows_mat[:num_windows]
-        print(f'{num_windows:>12,}/{x_ticks[-1]:>12,}')
-
-        # probe windows
-        row_ids = np.isin(ws[:, DISTANCE], test_word_ids)
-        probe_windows = ws[row_ids]
-
-        # make multi-variable array with different variables (slots) in rows
-        x = probe_windows.T
-        iii = drv.information_interaction(x).item()
-
-        ii.append(iii)
-
-    return ii
+Y_LIMS = None
 
 
-corpus_path = configs.Dirs.corpora / f'{CORPUS_NAME}.txt'
-train_docs, _ = load_docs(corpus_path,
-                          remove_symbols=REMOVE_SYMBOLS)
+def collect_data(ws: np.ndarray) -> float:
 
-prep = PartitionedPrep(train_docs,
-                       reverse=False,
-                       num_types=NUM_TYPES,
-                       num_parts=2,
-                       num_iterations=(20, 20),
-                       batch_size=64,
-                       context_size=DISTANCE * 2,  # +1 is added by prep to make "window"
-                       )
+    # probe windows
+    row_ids = np.isin(ws[:, DISTANCE], test_word_ids)
+    probe_windows = ws[row_ids]
 
-# load test words
-test_words = (configs.Dirs.words / f'{CORPUS_NAME}-{WORDS_NAME}.txt').open().read().split("\n")
-test_word_ids = [prep.store.w2id[w] for w in test_words if w in prep.store.w2id]  # must not be  a set
-print(f'Including {len(test_word_ids)} out of {len(test_words)} test_words in file')
+    # make multi-variable array with different variables (slots) in rows
+    x = probe_windows.T
+    iii = drv.information_interaction(x).item()
 
-# windows
-token_ids_array = np.array(prep.store.token_ids, dtype=np.int64)
-num_possible_windows = len(token_ids_array) - prep.num_tokens_in_window
-shape = (num_possible_windows, prep.num_tokens_in_window)
-windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
+    print(f'{len(ws):>12,} | ii={iii:.2f}')
+
+    return iii
+
+
+# get data
+prep = make_prep(CORPUS_NAME, REMOVE_SYMBOLS)
+test_words = make_test_words(prep, CORPUS_NAME, WORDS_NAME, REMOVE_NUMBERS)
+test_words = set(test_words)
+test_word_ids = [prep.store.w2id[w] for w in test_words]
+windows = make_windows(prep)
+
+# collect data in parallel
+pool = Pool(configs.Constants.num_processes)
+ii = [[], []]
 x_ticks = [int(i) for i in np.linspace(0, len(windows), configs.Constants.num_ticks + 1)][1:]
-print(f'prep.num_tokens_in_window={prep.num_tokens_in_window}')
-print(f'Matrix containing all windows has shape={windows.shape}')
+for n, windows in enumerate([windows, np.flip(windows, 0)]):
+    print()
+    for iii in pool.map(collect_data, [windows[:num_windows] for num_windows in x_ticks]):
+        ii[n].append(iii)
+pool.close()
 
-# collect data
-ii1 = collect_data(windows, reverse=False)
-ii2 = collect_data(windows, reverse=True)
 
 # fig
 title = f'Cumulative information-interaction between\n' \
-        f'{WORDS_NAME} words and words in {DISTANCE * 2}-word bidirectional window'
+        f'{WORDS_NAME} words and words in {DISTANCE * 2}-word bidirectional window\n' \
+        f'number words removed={REMOVE_NUMBERS}'
 x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
 y_axis_label = 'Entropy [bits]'
 labels1 = ['Int(X1, ..., Xn)']
 labels2 = ['age-ordered', 'reverse age-ordered']
-fig, ax = make_info_theory_fig([[ii1, ii2]],
+fig, ax = make_info_theory_fig([ii],
                                title,
                                x_axis_label,
                                y_axis_label,

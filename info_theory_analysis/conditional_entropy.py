@@ -8,25 +8,25 @@ conditional entropy (x, y) = how much moe information I need to figure out what 
 so if y is the probability distribution of next-words, and x is P over nouns,
  the hypothesis is that conditional entropy is higher in partition 1 vs. 2
 
+WARNING: because no normalization is used, it may not be a good idea to directly compare
+age-ordered vs reverse age-ordered results,
+rendering this script useless > use normalized MI instead
+
 """
 
-from pyitlib import discrete_random_variable as drv
-from numpy.lib.stride_tricks import as_strided
 import numpy as np
+from pyitlib import discrete_random_variable as drv
 import matplotlib.pyplot as plt
-
-from preppy import PartitionedPrep
-from preppy.docs import load_docs
 
 from ordermatters import configs
 from ordermatters.figs import make_info_theory_fig
+from ordermatters.utils import make_prep, make_windows, make_test_words
 
-# CORPUS_NAME = 'childes-20191206'
-CORPUS_NAME = 'newsela'
-# WORDS_NAME = 'nouns-2972'
-WORDS_NAME = 'numbers'
-DISTANCE = -1
-NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
+# CORPUS_NAME = 'newsela'
+CORPUS_NAME = 'childes-20191206'
+WORDS_NAME = 'sem-4096'
+DISTANCE = + 1
+REMOVE_SYMBOLS = None
 
 Y_LIMS = None
 
@@ -62,30 +62,13 @@ def collect_data(windows, reverse: bool):
 
     return ce, je, ye
 
-corpus_path = configs.Dirs.corpora / f'{CORPUS_NAME}.txt'
-train_docs, _ = load_docs(corpus_path)
 
-prep = PartitionedPrep(train_docs,
-                       reverse=False,
-                       num_types=NUM_TYPES,
-                       num_parts=2,
-                       num_iterations=(20, 20),
-                       batch_size=64,
-                       context_size=7,
-                       )
-
-
-# load test words
-test_words = (configs.Dirs.words / f'{CORPUS_NAME}-{WORDS_NAME}.txt').open().read().split("\n")
-test_word_ids = [prep.store.w2id[w] for w in test_words if w in prep.store.w2id]  # must not be  a set
-print(f'Including {len(test_word_ids)} out of {len(test_words)} test_words in file')
-
-# windows
-token_ids_array = np.array(prep.store.token_ids, dtype=np.int64)
-num_possible_windows = len(token_ids_array) - prep.num_tokens_in_window
-shape = (num_possible_windows, prep.num_tokens_in_window)
-windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
-print(f'Matrix containing all windows has shape={windows.shape}')
+# get data
+prep = make_prep(CORPUS_NAME, REMOVE_SYMBOLS)
+test_words = make_test_words(prep, CORPUS_NAME, WORDS_NAME)
+test_words = set(test_words)
+test_word_ids = [prep.store.w2id[w] for w in test_words]
+windows = make_windows(prep)
 
 # collect data
 x_ticks = [int(i) for i in np.linspace(0, len(windows), configs.Constants.num_ticks + 1)][1:]
@@ -109,6 +92,3 @@ fig, ax = make_info_theory_fig([[ce1, ce2], [je1, je2], [ye1, ye2]],
                                y_lims=Y_LIMS,
                                )
 plt.show()
-
-
-

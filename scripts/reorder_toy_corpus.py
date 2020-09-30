@@ -2,7 +2,7 @@ from scipy.stats import spearmanr
 
 from preppy import PartitionedPrep
 
-from ordermatters.toy_corpus import ToyCorpus
+from ordermatters.corpus_toy import ToyCorpus
 from ordermatters.reorder import reorder_by_conditional_entropy
 from ordermatters.reorder import reorder_by_joint_entropy
 
