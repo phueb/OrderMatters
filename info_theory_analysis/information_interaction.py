@@ -18,11 +18,11 @@ from ordermatters.utils import make_prep, make_windows, make_test_words
 # CORPUS_NAME = 'newsela'
 CORPUS_NAME = 'childes-20191206'
 WORDS_NAME = 'sem-4096'
-DISTANCE = + 1  # don't use negative int, due to bidirectional window
+DISTANCE = + 2  # don't use negative int, due to bidirectional window
 REMOVE_SYMBOLS = None
 REMOVE_NUMBERS = True
 
-Y_LIMS = None
+Y_LIMS = [0.5, 2.5]
 
 
 def collect_data(ws: np.ndarray) -> float:
