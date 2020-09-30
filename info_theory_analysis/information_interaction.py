@@ -19,17 +19,17 @@ from preppy.docs import load_docs
 from ordermatters.figs import make_info_theory_fig
 from ordermatters import configs
 
-# CORPUS_NAME = 'newsela'
-CORPUS_NAME = 'childes-20191206'
+CORPUS_NAME = 'newsela'
+# CORPUS_NAME = 'childes-20191206'
 # WORDS_NAME = 'nouns-copied-from-childes'
 # WORDS_NAME = 'nouns-2972'
-# WORDS_NAME = 'sem-4096'
-WORDS_NAME = 'numbers'
+WORDS_NAME = 'sem-4096'
+# WORDS_NAME = 'numbers'
 NUM_TYPES = 4096 * 4 if CORPUS_NAME == 'newsela' else 4096
 REMOVE_SYMBOLS = None
-DISTANCE = 1  # half of bidirectional window, excluding probe
+DISTANCE = 2  # half of bidirectional window, excluding probe
 
-Y_LIMS = None  # [0.8, 3.8]  # [0.5, 1.6]  # [0.0, 3.0]
+Y_LIMS = [0.5, 3.0]  # [-0.5, 0.8]  # [0.8, 3.8]  # [0.5, 1.6]  # [0.0, 3.0]
 
 
 def collect_data(windows_mat, reverse: bool) -> List[float]:
