@@ -24,7 +24,7 @@ from ordermatters.utils import make_prep, make_windows, make_test_words
 CORPUS_NAME = 'childes-20191206'
 WORDS_NAME = 'sem-4096'
 DISTANCE = + 1
-REMOVE_NUMBERS = False
+REMOVE_NUMBERS = True
 REMOVE_SYMBOLS = None
 
 Y_LIMS = None
@@ -81,7 +81,49 @@ for n, windows in enumerate([windows, np.flip(windows, 0)]):
         val2[n].append(val2i)
 pool.close()
 
-# fig
+# fig - val 1
+title = f'"Cumulative info about items vs. category" about {WORDS_NAME} words\n' \
+        f'given neighbor at distance={DISTANCE}\n' \
+        f'remove number words={REMOVE_NUMBERS}'
+x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
+y_axis_label = 'Mutual Information [bits]'
+labels1 = ['I(categorical(X);Y)']
+labels2 = ['age-ordered', 'reverse age-ordered']
+fig, ax = make_info_theory_fig([
+    val1,
+],
+    title,
+    x_axis_label,
+    y_axis_label,
+    x_ticks,
+    labels1,
+    labels2,
+    y_lims=Y_LIMS,
+)
+plt.show()
+
+# fig - val 2
+title = f'"Cumulative info about items vs. category" about {WORDS_NAME} words\n' \
+        f'given neighbor at distance={DISTANCE}\n' \
+        f'remove number words={REMOVE_NUMBERS}'
+x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
+y_axis_label = 'Mutual Information [bits]'
+labels1 = ['I(X;Y)']
+labels2 = ['age-ordered', 'reverse age-ordered']
+fig, ax = make_info_theory_fig([
+    val2,
+],
+    title,
+    x_axis_label,
+    y_axis_label,
+    x_ticks,
+    labels1,
+    labels2,
+    y_lims=Y_LIMS,
+)
+plt.show()
+
+# fig - both values together
 title = f'"Cumulative info about items vs. category" about {WORDS_NAME} words\n' \
         f'given neighbor at distance={DISTANCE}\n' \
         f'remove number words={REMOVE_NUMBERS}'
@@ -90,9 +132,7 @@ y_axis_label = 'Mutual Information [bits]'
 labels1 = ['I(categorical(X);Y) - I(X;Y)']
 labels2 = ['age-ordered', 'reverse age-ordered']
 fig, ax = make_info_theory_fig([
-    # val1,
-    # val2,
-    np.subtract(val1, val2)
+    np.subtract(val1, val2),
 ],
     title,
     x_axis_label,
