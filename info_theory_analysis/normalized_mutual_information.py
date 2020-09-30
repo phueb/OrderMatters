@@ -50,7 +50,7 @@ test_words = set(test_words)
 test_word_ids = [prep.store.w2id[w] for w in test_words]
 windows = make_windows(prep)
 
-# collect data in parallel
+# collect results in parallel
 pool = Pool(configs.Constants.num_processes)
 mi = [[], []]
 x_ticks = [int(i) for i in np.linspace(0, len(windows), configs.Constants.num_ticks + 1)][1:]

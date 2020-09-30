@@ -18,9 +18,9 @@ from ordermatters.utils import make_prep, make_windows, make_test_words
 # CORPUS_NAME = 'newsela'
 CORPUS_NAME = 'childes-20191206'
 WORDS_NAME = 'sem-4096'
-DISTANCE = + 1
+DISTANCE = + 1  # don't use negative int, due to bidirectional window
 REMOVE_SYMBOLS = None
-REMOVE_NUMBERS = False
+REMOVE_NUMBERS = True
 
 Y_LIMS = None
 
@@ -41,13 +41,14 @@ def collect_data(ws: np.ndarray) -> float:
 
 
 # get data
-prep = make_prep(CORPUS_NAME, REMOVE_SYMBOLS)
+prep = make_prep(CORPUS_NAME, REMOVE_SYMBOLS,
+                 context_size=DISTANCE * 2)  # +1 is added by prep to make "window")
 test_words = make_test_words(prep, CORPUS_NAME, WORDS_NAME, REMOVE_NUMBERS)
 test_words = set(test_words)
 test_word_ids = [prep.store.w2id[w] for w in test_words]
 windows = make_windows(prep)
 
-# collect data in parallel
+# collect results in parallel
 pool = Pool(configs.Constants.num_processes)
 ii = [[], []]
 x_ticks = [int(i) for i in np.linspace(0, len(windows), configs.Constants.num_ticks + 1)][1:]

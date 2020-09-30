@@ -9,7 +9,9 @@ from ordermatters import configs
 
 
 def make_prep(corpus_name: str,
-              remove_symbols: Optional[List[str]] = None) -> PartitionedPrep:
+              remove_symbols: Optional[List[str]] = None,
+              context_size: int = 7,
+              ) -> PartitionedPrep:
     corpus_path = configs.Dirs.corpora / f'{corpus_name}.txt'
     train_docs, _ = load_docs(corpus_path,
                               remove_symbols=remove_symbols)
@@ -20,7 +22,7 @@ def make_prep(corpus_name: str,
                            num_parts=2,
                            num_iterations=(20, 20),
                            batch_size=64,
-                           context_size=7,
+                           context_size=context_size,
                            )
     return prep
 
