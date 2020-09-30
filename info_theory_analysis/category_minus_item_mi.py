@@ -1,7 +1,12 @@
 """
-Develop a new quantity for quantifying whether a corpus "starts-good"
+A new quantity for quantifying whether a corpus "starts-good":
 
-# TODO test this quantity on toy corpus
+mi1 - mi2, where
+mi1 measures the relationship between a category (defined by test words) and their neighbors
+mi2 measures the relationship between individual test words and their neighbors
+
+a "good start should have large mi1 and small mi2
+
 
 """
 
@@ -19,10 +24,12 @@ from ordermatters.utils import make_prep, make_windows, make_test_words
 CORPUS_NAME = 'childes-20191206'
 WORDS_NAME = 'sem-4096'
 DISTANCE = + 1
-REMOVE_NUMBERS = True
+REMOVE_NUMBERS = False
 REMOVE_SYMBOLS = None
 
 Y_LIMS = None
+
+# TODO test this quantity on toy corpus
 
 
 def collect_data(ws: np.ndarray) -> Tuple[float, float]:
@@ -76,7 +83,8 @@ pool.close()
 
 # fig
 title = f'"Cumulative info about items vs. category" about {WORDS_NAME} words\n' \
-        f'given neighbor at distance={DISTANCE}'
+        f'given neighbor at distance={DISTANCE}\n' \
+        f'remove number words={REMOVE_NUMBERS}'
 x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
 y_axis_label = 'Mutual Information [bits]'
 labels1 = ['I(categorical(X);Y) - I(X;Y)']
