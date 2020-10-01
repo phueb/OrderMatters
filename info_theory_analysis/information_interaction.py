@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 from ordermatters import configs
 from ordermatters.figs import make_info_theory_fig
-from ordermatters.utils import make_prep, make_windows, make_test_words
+from ordermatters.utils import make_prep_from_naturalistic, make_windows, make_test_words
 
 # CORPUS_NAME = 'newsela'
 CORPUS_NAME = 'childes-20191206'
@@ -41,8 +41,8 @@ def collect_data(ws: np.ndarray) -> float:
 
 
 # get data
-prep = make_prep(CORPUS_NAME, REMOVE_SYMBOLS,
-                 context_size=DISTANCE * 2)  # +1 is added by prep to make "window")
+prep = make_prep_from_naturalistic(CORPUS_NAME, REMOVE_SYMBOLS,
+                                   context_size=DISTANCE * 2)  # +1 is added by prep to make "window")
 test_words = make_test_words(prep, CORPUS_NAME, WORDS_NAME, REMOVE_NUMBERS)
 test_words = set(test_words)
 test_word_ids = [prep.store.w2id[w] for w in test_words]

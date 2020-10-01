@@ -16,9 +16,15 @@ from typing import List, Tuple
 from pyitlib import discrete_random_variable as drv
 import matplotlib.pyplot as plt
 
+from preppy import PartitionedPrep
+
+from ordermatters.corpus_toy import ToyCorpus
 from ordermatters import configs
 from ordermatters.figs import make_info_theory_fig
-from ordermatters.utils import make_prep, make_windows, make_test_words
+from ordermatters.utils import make_prep_from_naturalistic, make_windows, make_test_words
+
+
+TOY_DATA = True
 
 # CORPUS_NAME = 'newsela'
 CORPUS_NAME = 'childes-20191206'
@@ -27,9 +33,7 @@ DISTANCE = + 1
 REMOVE_NUMBERS = True
 REMOVE_SYMBOLS = None
 
-Y_LIMS = None
-
-# TODO test this quantity on toy corpus
+Y_LIMS = [-0.5, 0.0]
 
 
 def collect_data(ws: np.ndarray) -> Tuple[float, float]:
@@ -62,9 +66,24 @@ def collect_data(ws: np.ndarray) -> Tuple[float, float]:
     return val1i, val2i
 
 
-# get data
-prep = make_prep(CORPUS_NAME, REMOVE_SYMBOLS)
-test_words = make_test_words(prep, CORPUS_NAME, WORDS_NAME, REMOVE_NUMBERS)
+# get data from toy corpus
+if TOY_DATA:
+    tc = ToyCorpus()
+    prep = PartitionedPrep(tc.docs,
+                           reverse=False,
+                           num_types=tc.num_types,
+                           num_parts=2,
+                           num_iterations=(1, 1),
+                           batch_size=64,
+                           context_size=1)
+    test_words = [p for p in tc.nouns if p in prep.store.w2id]
+
+# get data from naturalistic corpus
+else:
+    tc = None
+    prep = make_prep_from_naturalistic(CORPUS_NAME, REMOVE_SYMBOLS)
+    test_words = make_test_words(prep, CORPUS_NAME, WORDS_NAME, REMOVE_NUMBERS)
+
 test_words = set(test_words)
 test_word_ids = [prep.store.w2id[w] for w in test_words]
 windows = make_windows(prep)
@@ -81,15 +100,22 @@ for n, windows in enumerate([windows, np.flip(windows, 0)]):
         val2[n].append(val2i)
 pool.close()
 
+if TOY_DATA:
+    title_additional = f'toy data with num_docs={tc.num_docs} and doc_size={tc.doc_size}\n'\
+                       f'increase_noun_types={tc.increase_noun_types}\n' \
+                       f'increase_other_types={tc.increase_other_types}\n'
+else:
+    title_additional = f'test words={WORDS_NAME}\n' \
+                       f'neighbors at distance={DISTANCE}\n' \
+                       f'remove number words={REMOVE_NUMBERS}\n'
+
 # fig - val 1
-title = f'"Cumulative info about items vs. category" about {WORDS_NAME} words\n' \
-        f'given neighbor at distance={DISTANCE}\n' \
-        f'remove number words={REMOVE_NUMBERS}'
+title = f'Component 1\n' + title_additional
 x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
 y_axis_label = 'Mutual Information [bits]'
 labels1 = ['I(categorical(X);Y)']
 labels2 = ['age-ordered', 'reverse age-ordered']
-fig, ax = make_info_theory_fig([
+make_info_theory_fig([
     val1,
 ],
     title,
@@ -98,19 +124,16 @@ fig, ax = make_info_theory_fig([
     x_ticks,
     labels1,
     labels2,
-    y_lims=Y_LIMS,
 )
 plt.show()
 
 # fig - val 2
-title = f'"Cumulative info about items vs. category" about {WORDS_NAME} words\n' \
-        f'given neighbor at distance={DISTANCE}\n' \
-        f'remove number words={REMOVE_NUMBERS}'
+title = f'Component 2\n'  + title_additional
 x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
 y_axis_label = 'Mutual Information [bits]'
 labels1 = ['I(X;Y)']
 labels2 = ['age-ordered', 'reverse age-ordered']
-fig, ax = make_info_theory_fig([
+make_info_theory_fig([
     val2,
 ],
     title,
@@ -119,19 +142,16 @@ fig, ax = make_info_theory_fig([
     x_ticks,
     labels1,
     labels2,
-    y_lims=Y_LIMS,
 )
 plt.show()
 
 # fig - both values together
-title = f'"Cumulative info about items vs. category" about {WORDS_NAME} words\n' \
-        f'given neighbor at distance={DISTANCE}\n' \
-        f'remove number words={REMOVE_NUMBERS}'
+title = f'Cumulative info about test word category - items\n' + title_additional
 x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
 y_axis_label = 'Mutual Information [bits]'
 labels1 = ['I(categorical(X);Y) - I(X;Y)']
 labels2 = ['age-ordered', 'reverse age-ordered']
-fig, ax = make_info_theory_fig([
+make_info_theory_fig([
     np.subtract(val1, val2),
 ],
     title,

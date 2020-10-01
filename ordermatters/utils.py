@@ -8,10 +8,10 @@ from preppy.docs import load_docs
 from ordermatters import configs
 
 
-def make_prep(corpus_name: str,
-              remove_symbols: Optional[List[str]] = None,
-              context_size: int = 7,
-              ) -> PartitionedPrep:
+def make_prep_from_naturalistic(corpus_name: str,
+                                remove_symbols: Optional[List[str]] = None,
+                                context_size: int = 7,
+                                ) -> PartitionedPrep:
     corpus_path = configs.Dirs.corpora / f'{corpus_name}.txt'
     train_docs, _ = load_docs(corpus_path,
                               remove_symbols=remove_symbols)
