@@ -34,6 +34,7 @@ REMOVE_NUMBERS = True
 REMOVE_SYMBOLS = None
 
 Y_LIMS = [-0.5, 0.0]
+SHOW_COMPONENTS = False
 
 
 def collect_data(ws: np.ndarray) -> Tuple[float, float]:
@@ -109,41 +110,42 @@ else:
                        f'neighbors at distance={DISTANCE}\n' \
                        f'remove number words={REMOVE_NUMBERS}\n'
 
-# fig - val 1
-title = f'Component 1\n' + title_additional
-x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
-y_axis_label = 'Mutual Information [bits]'
-labels1 = ['I(categorical(X);Y)']
-labels2 = ['age-ordered', 'reverse age-ordered']
-make_info_theory_fig([
-    val1,
-],
-    title,
-    x_axis_label,
-    y_axis_label,
-    x_ticks,
-    labels1,
-    labels2,
-)
-plt.show()
+if SHOW_COMPONENTS:
+    # fig - val 1
+    title = f'Component 1\n' + title_additional
+    x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
+    y_axis_label = 'Mutual Information [bits]'
+    labels1 = ['I(categorical(X);Y)']
+    labels2 = ['age-ordered', 'reverse age-ordered']
+    make_info_theory_fig([
+        val1,
+    ],
+        title,
+        x_axis_label,
+        y_axis_label,
+        x_ticks,
+        labels1,
+        labels2,
+    )
+    plt.show()
 
-# fig - val 2
-title = f'Component 2\n'  + title_additional
-x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
-y_axis_label = 'Mutual Information [bits]'
-labels1 = ['I(X;Y)']
-labels2 = ['age-ordered', 'reverse age-ordered']
-make_info_theory_fig([
-    val2,
-],
-    title,
-    x_axis_label,
-    y_axis_label,
-    x_ticks,
-    labels1,
-    labels2,
-)
-plt.show()
+    # fig - val 2
+    title = f'Component 2\n'  + title_additional
+    x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
+    y_axis_label = 'Mutual Information [bits]'
+    labels1 = ['I(X;Y)']
+    labels2 = ['age-ordered', 'reverse age-ordered']
+    make_info_theory_fig([
+        val2,
+    ],
+        title,
+        x_axis_label,
+        y_axis_label,
+        x_ticks,
+        labels1,
+        labels2,
+    )
+    plt.show()
 
 # fig - both values together
 title = f'Cumulative info about test word category - items\n' + title_additional

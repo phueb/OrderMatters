@@ -1,7 +1,6 @@
 from typing import List
 from cached_property import cached_property
 import random
-from itertools import cycle
 
 
 class ToyCorpus:
@@ -22,9 +21,6 @@ class ToyCorpus:
                  num_docs: int = 32,
                  doc_size: int = 10_000,
                  num_types: int = 4096,
-                 num_nouns: int = 512,
-                 min_nouns: int = 256,
-                 min_others: int = 2048,
                  doc_offset: int = 0,  # the larger, the faster the noun population reaches its maximum
                  increase_noun_types: bool = True,  # whether to gradually introduce new nouns
                  increase_other_types: bool = False,  # whether to gradually introduce new others
@@ -32,13 +28,15 @@ class ToyCorpus:
         self.num_docs = num_docs
         self.doc_size = doc_size
         self.num_types = num_types
-        self.num_nouns = num_nouns
-        self.num_others = num_types - num_nouns
-        self.min_nouns = min_nouns
-        self.min_others = min_others
         self.doc_offset = doc_offset
         self.increase_noun_types = increase_noun_types
         self.increase_other_types = increase_other_types
+
+        self.num_nouns = num_types // 2
+        self.num_others = num_types // 2
+        self.min_nouns = self.num_nouns // 2
+        self.min_others = self.num_others // 2
+        assert self.num_nouns + self.num_others == self.num_types
 
         self.nouns = [f'n{i:0>6}' for i in range(self.num_nouns)]
         self.others = [f'o{i:0>6}' for i in range(self.num_others)]
@@ -57,7 +55,6 @@ class ToyCorpus:
         # gradually increase noun population across consecutive documents from which to sample
         if self.increase_noun_types:
             limit = self.num_nouns * ((doc_id + self.doc_offset) / self.num_docs)
-            print(limit)
             nouns = self.nouns[:int(max(self.min_nouns, limit + 1))]
         else:
             nouns = self.nouns
@@ -65,8 +62,6 @@ class ToyCorpus:
         # gradually increase non-noun/other population across consecutive documents from which to sample
         if self.increase_other_types:
             limit = self.num_others * ((doc_id + self.doc_offset) / self.num_docs)
-            print(limit)
-            print()
             others = self.others[:int(max(self.min_others, limit + 1))]
         else:
             others = self.others
