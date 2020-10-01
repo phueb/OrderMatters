@@ -2,10 +2,10 @@
 A new quantity for quantifying whether a corpus "starts-good":
 
 mi1 - mi2, where
-mi1 measures the relationship between a category (defined by test words) and their neighbors
+mi1 measures the relationship between all words in corpus and their neighbors
 mi2 measures the relationship between individual test words and their neighbors
 
-a "good start should have large mi1 and small mi2
+a "good start should have large difference
 
 
 """
@@ -24,7 +24,7 @@ from ordermatters.figs import make_info_theory_fig
 from ordermatters.utils import make_prep_from_naturalistic, make_windows, make_test_words
 
 
-TOY_DATA = True
+TOY_DATA = False
 
 # CORPUS_NAME = 'newsela'
 CORPUS_NAME = 'childes-20191206'
@@ -32,25 +32,32 @@ WORDS_NAME = 'sem-4096'
 DISTANCE = + 1
 REMOVE_NUMBERS = True
 REMOVE_SYMBOLS = None
+NORM_FACTOR = 'Y'
 
-Y_LIMS = [-0.5, 0.0]
-SHOW_COMPONENTS = False
+Y_LIMS = None
+SHOW_COMPONENTS = True
 
 
 def collect_data(ws: np.ndarray) -> Tuple[float, float]:
 
     ###############
-    # val1: use all windows, and make observations in x categorical (test_word vs. not-a-test_word)
+    # val1: use all windows; this provides a control/reference from which to measure distance to val2
+    # (should be 0.0 when using toy corpus)
     ###############
 
     # val1
     x1 = ws[:, -2]  # all words
     y1 = ws[:, -2 + DISTANCE]  # neighbors
-    x1 = [1 if prep.store.types[i] in test_words else 0 for i in x1]  # make categorical
-    val1i = drv.information_mutual_normalised(x1, y1).item()
+    val1i = drv.information_mutual_normalised(x1, y1, norm_factor=NORM_FACTOR).item()
 
     ###############
     # val2: use only test_word windows
+    # in theory, this should be invariant to number of test-word types,
+    # but in practice, given fewer test word types, their next-word distributions will be more dense,
+    # and thus result in a lower mutual information estimate compared to less dense next-word distributions,
+    # which occurs when there are a greater number of test word types.
+    # in other words, this measure approaches the ground truth (zero)
+    # as the number of samples for each test word type increases
     ###############
 
     # test_word windows
@@ -60,7 +67,7 @@ def collect_data(ws: np.ndarray) -> Tuple[float, float]:
     # val2
     x2 = test_word_windows[:, -2]  # test_word
     y2 = test_word_windows[:, -2 + DISTANCE]  # neighbors
-    val2i = drv.information_mutual_normalised(x2, y2).item()
+    val2i = drv.information_mutual_normalised(x2, y2, norm_factor=NORM_FACTOR).item()
 
     print(f'{len(ws):>12,} | val1={val1i:.3f} val2={val2i:.2f}')
 
@@ -113,9 +120,9 @@ else:
 if SHOW_COMPONENTS:
     # fig - val 1
     title = f'Component 1\n' + title_additional
-    x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
+    x_axis_label = f'Location in {"toy data" if TOY_DATA else CORPUS_NAME} [num tokens]'
     y_axis_label = 'Mutual Information [bits]'
-    labels1 = ['I(categorical(X);Y)']
+    labels1 = ['I(all X;Y)']
     labels2 = ['age-ordered', 'reverse age-ordered']
     make_info_theory_fig([
         val1,
@@ -130,10 +137,10 @@ if SHOW_COMPONENTS:
     plt.show()
 
     # fig - val 2
-    title = f'Component 2\n'  + title_additional
-    x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
+    title = f'Component 2\n' + title_additional
+    x_axis_label = f'Location in {"toy data" if TOY_DATA else CORPUS_NAME} [num tokens]'
     y_axis_label = 'Mutual Information [bits]'
-    labels1 = ['I(X;Y)']
+    labels1 = ['I(test-word X;Y)']
     labels2 = ['age-ordered', 'reverse age-ordered']
     make_info_theory_fig([
         val2,
@@ -148,10 +155,10 @@ if SHOW_COMPONENTS:
     plt.show()
 
 # fig - both values together
-title = f'Cumulative info about test word category - items\n' + title_additional
-x_axis_label = f'Location in {CORPUS_NAME} [num tokens]'
+title = f'Component 1 - Component 2\n' + title_additional
+x_axis_label = f'Location in {"toy data" if TOY_DATA else CORPUS_NAME} [num tokens]'
 y_axis_label = 'Mutual Information [bits]'
-labels1 = ['I(categorical(X);Y) - I(X;Y)']
+labels1 = ['I(all X;Y) - I(test-word X;Y)']
 labels2 = ['age-ordered', 'reverse age-ordered']
 make_info_theory_fig([
     np.subtract(val1, val2),
@@ -165,3 +172,6 @@ make_info_theory_fig([
     y_lims=Y_LIMS,
 )
 plt.show()
+
+if TOY_DATA:
+    print('Showing results for toy corpus, not naturalistic corpus')
