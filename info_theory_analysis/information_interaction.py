@@ -1,7 +1,7 @@
 """
-Compute conditional entropy of distribution of all words in sequence, given probe word in the same sequence.
+Compute conditional entropy of distribution of all words in sequence, given test_word word in the same sequence.
 This considers left and right and nonadjacent dependencies and is therefore a more complete indicator
-of how probe words are redundant with their neighbors.
+of how test_word words are redundant with their neighbors.
 
 """
 
@@ -18,6 +18,7 @@ from ordermatters.utils import make_prep_from_naturalistic, make_windows, make_t
 # CORPUS_NAME = 'newsela'
 CORPUS_NAME = 'childes-20191206'
 WORDS_NAME = 'sem-4096'
+# WORDS_NAME = 'nouns-2972'
 DISTANCE = + 2  # don't use negative int, due to bidirectional window
 REMOVE_SYMBOLS = None
 REMOVE_NUMBERS = True
@@ -27,12 +28,12 @@ Y_LIMS = [0.5, 2.5]
 
 def collect_data(ws: np.ndarray) -> float:
 
-    # probe windows
+    # test_word windows
     row_ids = np.isin(ws[:, DISTANCE], test_word_ids)
-    probe_windows = ws[row_ids]
+    test_word_windows = ws[row_ids]
 
     # make multi-variable array with different variables (slots) in rows
-    x = probe_windows.T
+    x = test_word_windows.T
     iii = drv.information_interaction(x).item()
 
     print(f'{len(ws):>12,} | ii={iii:.2f}')

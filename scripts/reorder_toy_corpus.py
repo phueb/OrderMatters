@@ -3,8 +3,8 @@ from scipy.stats import spearmanr
 from preppy import PartitionedPrep
 
 from ordermatters.corpus_toy import ToyCorpus
-from ordermatters.reorder import reorder_by_conditional_entropy
-from ordermatters.reorder import reorder_by_joint_entropy
+from ordermatters.reorder import compute_mutual_information_difference
+from ordermatters.reorder import compute_joint_entropy
 
 NUM_PARTS = 2
 NUM_NOUNS = 512
@@ -30,8 +30,8 @@ prep = PartitionedPrep(tc.docs,
 # input to spearman correlation
 ordered_part_ids = [n for n in range(NUM_PARTS)]
 test_words = [p for p in tc.nouns if p in prep.store.w2id]
-reordered_part_ids_ce = reorder_by_conditional_entropy(prep, test_words, verbose=True)
-reordered_part_ids_je = reorder_by_joint_entropy(prep, test_words, verbose=True)
+reordered_part_ids_ce = compute_mutual_information_difference(prep, test_words, verbose=True)
+reordered_part_ids_je = compute_joint_entropy(prep, test_words, verbose=True)
 
 print('ordering by decreasing conditional entropy:')
 rho, p_value = spearmanr(ordered_part_ids, reordered_part_ids_ce)

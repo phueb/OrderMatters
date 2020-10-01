@@ -1,6 +1,6 @@
 """
 Research question:
-Is mutual information between a probe and a neighbor higher in partition 1 of AO-CHILDES?
+Is mutual information between a test_word and a neighbor higher in partition 1 of AO-CHILDES?
 
 """
 
@@ -28,14 +28,14 @@ Y_LIMS = None
 
 def collect_data(ws: np.ndarray) -> float:
 
-    # probe windows
+    # test_word windows
     row_ids = np.isin(ws[:, -2], test_word_ids)
-    probe_windows = ws[row_ids]
+    test_word_windows = ws[row_ids]
 
     # mutual info
     assert DISTANCE <= 1
-    x = probe_windows[:, -2]  # probe
-    y = probe_windows[:, -2 + DISTANCE]  # left or right context
+    x = test_word_windows[:, -2]  # test_word
+    y = test_word_windows[:, -2 + DISTANCE]  # left or right context
     mii = drv.information_mutual_normalised(x, y, norm_factor=NORM_FACTOR)
 
     print(f'{len(ws):>12,} | mi={mii:.2f}')

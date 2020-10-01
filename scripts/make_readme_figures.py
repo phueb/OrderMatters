@@ -38,12 +38,12 @@ num_possible_windows = len(token_ids_array) - prep.num_tokens_in_window
 shape = (num_possible_windows, prep.num_tokens_in_window)
 windows = as_strided(token_ids_array, shape, strides=(8, 8), writeable=False)
 
-# probe windows
+# test_word windows
 row_ids = np.isin(windows[:, -2], test_word_ids)
-probe_windows = windows[row_ids]
+test_word_windows = windows[row_ids]
 
-x_actual = probe_windows[:, -2]  # CAT member
-y_actual = probe_windows[:, -1]  # next-word
+x_actual = test_word_windows[:, -2]  # test word
+y_actual = test_word_windows[:, -1]  # next-word
 
 # map word ID of nouns to IDs between [0, len(test_words)]
 # this makes creating a matrix with the right number of columns easier
