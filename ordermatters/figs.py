@@ -91,30 +91,3 @@ def add_double_legend(lines_list, labels1, labels2, y_offset=-0.3, fs=configs.Fi
 
     # add legend 2
     plt.gca().add_artist(leg2)  # order of legend creation matters here
-
-
-def plot_singular_values(ys: List[np.ndarray],
-                         max_s: int,
-                         font_size: int = 12,
-                         figsize: Tuple[int] = (5, 5),
-                         markers: bool = False,
-                         label_all_x: bool = False):
-    fig, ax = plt.subplots(1, figsize=figsize, dpi=None)
-    plt.title('SVD of simulated co-occurrence matrix', fontsize=configs.Figs.title_font_size)
-    ax.set_ylabel('Singular value', fontsize=configs.Figs.ax_font_size)
-    ax.set_xlabel('Singular Dimension', fontsize=configs.Figs.ax_font_size)
-    ax.spines['right'].set_visible(False)
-    ax.spines['top'].set_visible(False)
-    ax.tick_params(axis='both', which='both', top=False, right=False)
-    x = np.arange(max_s) + 1  # num columns
-    if label_all_x:
-        ax.set_xticks(x)
-        ax.set_xticklabels(x)
-    # plot
-    for n, y in enumerate(ys):
-        ax.plot(x, y, label='toy corpus part {}'.format(n + 1), linewidth=2)
-        if markers:
-            ax.scatter(x, y)
-    ax.legend(loc='upper right', frameon=False, fontsize=configs.Figs.ax_font_size)
-    plt.tight_layout()
-    plt.show()
