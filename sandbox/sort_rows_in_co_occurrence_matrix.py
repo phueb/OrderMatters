@@ -11,7 +11,6 @@ from pyitlib import discrete_random_variable as drv
 from itertools import combinations
 
 from ordermatters import configs
-from ordermatters.memory import set_memory_limit
 from ordermatters.utils import make_prep_from_naturalistic, make_windows, make_test_words
 
 # CORPUS_NAME = 'newsela'
@@ -22,11 +21,8 @@ REMOVE_SYMBOLS = None
 REMOVE_NUMBERS = True
 
 R = 4  # the smaller the faster
-MIN_NW_F = 200  # the larger the faster
+MIN_NW_F = 100  # the larger the faster
 NUM_ROWS_MORE_OR_LESS = 10_000  # may not return results if this is too small
-
-set_memory_limit(prop=0.9)
-
 
 def nCr(n,r):
     f = math.factorial
