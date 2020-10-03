@@ -10,7 +10,7 @@ class Dirs:
 
 class Constants:
     num_ticks = 32
-    num_processes = 6
+    num_processes = 4
 
 
 class Figs:

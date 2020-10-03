@@ -24,7 +24,7 @@ from ordermatters.figs import make_info_theory_fig
 from ordermatters.utils import make_prep_from_naturalistic, make_windows, make_test_words
 
 
-TOY_DATA = False
+TOY_DATA = True
 
 # CORPUS_NAME = 'newsela'
 CORPUS_NAME = 'childes-20191206'

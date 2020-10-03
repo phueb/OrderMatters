@@ -13,8 +13,8 @@ from ordermatters.reorder import compute_unconditional_entropy
 from ordermatters.reorder import compute_information_interaction
 
 NUM_PARTS = 32
-# CORPUS_NAME = 'newsela'
-CORPUS_NAME = 'childes-20191206'
+CORPUS_NAME = 'newsela'
+# CORPUS_NAME = 'childes-20191206'
 REMOVE_NUMBER_WORDS = True  # this is important
 NUM_SKIP_FIRST_DOCS = 0
 RIGHT_NEIGHBORS = True
@@ -76,6 +76,7 @@ for n, part in enumerate(prep.reordered_parts):
     # windows with test_word in position -2
     row_ids = np.isin(windows[:, -2], test_word_ids)
     test_word_windows = windows[row_ids]
+    print(f'num test words={len(test_word_windows)}')
 
     # compute measures
     jes.append(compute_joint_entropy(test_word_windows, col_id))

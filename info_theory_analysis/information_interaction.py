@@ -19,11 +19,11 @@ from ordermatters.utils import make_prep_from_naturalistic, make_windows, make_t
 CORPUS_NAME = 'childes-20191206'
 WORDS_NAME = 'sem-4096'
 # WORDS_NAME = 'nouns-2972'
-DISTANCE = + 2  # don't use negative int, due to bidirectional window
+DISTANCE = + 1  # don't use negative int, due to bidirectional window
 REMOVE_SYMBOLS = None
 REMOVE_NUMBERS = True
 
-Y_LIMS = [0.5, 2.5]
+Y_LIMS = [-0.5, 0.5]
 
 
 def collect_data(ws: np.ndarray) -> float:
