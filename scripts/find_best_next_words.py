@@ -14,7 +14,7 @@ from ordermatters import configs
 from ordermatters.utils import make_prep_from_naturalistic, make_windows, make_test_words
 
 # CORPUS_NAME = 'newsela'
-CORPUS_NAME = 'childes-20191206'
+CORPUS_NAME = 'childes-20191112'
 WORDS_NAME = 'sem-4096'
 DISTANCE = + 1
 REMOVE_SYMBOLS = None

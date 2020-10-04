@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import List
 from random import shuffle
 
@@ -7,9 +6,9 @@ from preppy.docs import split_into_sentences
 from ordermatters import configs
 
 # CORPUS_NAME = 'newsela'
-CORPUS_NAME = 'childes-20191206'
+CORPUS_NAME = 'childes-20191112'
 WORDS_NAME = 'sem-4096'
-RIGHT_NEIGHBORS = ['.', '?', 'with', 'that']
+RIGHT_NEIGHBORS = ['.', '?', 'with', 'OOV', 'right']  # ['.', '?', 'with', 'that']
 REMOVE_NUMBER_WORDS = True
 
 
@@ -105,7 +104,7 @@ lines2 = make_lines_in_part(part2_sentences, num_docs_in_part2, num_sentences2_p
 
 
 # save to file
-out_path = configs.Dirs.root / 'reordered_corpora' / f'{CORPUS_NAME}-reordered_by_rn_ce.txt'
+out_path = configs.Dirs.root / 'reordered_corpora' / f'{CORPUS_NAME}-ce.txt'
 out_file = out_path.open('w')
 for n, line in enumerate(lines1 + lines2):
     # print(f'Writing line {n}')
