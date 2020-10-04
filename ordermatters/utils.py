@@ -14,13 +14,14 @@ def make_prep_from_naturalistic(corpus_name: str,
                                 ) -> PartitionedPrep:
     corpus_path = configs.Dirs.corpora / f'{corpus_name}.txt'
     train_docs, _ = load_docs(corpus_path,
+                              num_test_docs=0,
                               remove_symbols=remove_symbols)
 
     prep = PartitionedPrep(train_docs,
                            reverse=False,
                            num_types=4096 * 4 if corpus_name == 'newsela' else 4096,
                            num_parts=2,
-                           num_iterations=(20, 20),
+                           num_iterations=(1, 1),
                            batch_size=64,
                            context_size=context_size,
                            )
