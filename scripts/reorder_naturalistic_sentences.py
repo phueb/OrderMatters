@@ -20,13 +20,24 @@ def make_lines_in_part(sentences_in_part: List[List[str]],
     res = []
     for doc_id in range(num_docs_in_part):
         _line: str = ''
-        s_in_line = 0
         for _ in range(num_sentences_in_doc):
             _s: List[str] = sentences_in_part.pop()
             _s_string: str = ' '.join(_s)
             _line += f'{_s_string} '
         _line += '\n'
         res.append(_line)
+
+    # put leftover sentences in last doc
+    _line: str = ''
+    for _ in range(len(sentences_in_part)):
+        _s: List[str] = sentences_in_part.pop()
+        _s_string: str = ' '.join(_s)
+        _line += f'{_s_string} '
+    _line += '\n'
+    res.append(_line)
+
+    assert len(sentences_in_part) == 0
+
     return res
 
 
