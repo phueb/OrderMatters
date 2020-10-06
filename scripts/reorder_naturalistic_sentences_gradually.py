@@ -12,6 +12,24 @@ CORPUS_NAME = 'childes-20191112'
 WORDS_NAME = 'sem-4096'
 RIGHT_NEIGHBORS = ['.', '?', 'with', 'OOV', 'right']  # ['.', '?', 'with', 'that']
 REMOVE_NUMBER_WORDS = True
+DIVISOR = 8  # larger -> less extreme start (2 -> prob1 = 1/2=0.5 -> no order)
+
+
+def make_line(sentences1: List[List[str]],
+              sentences2: List[List[str]],
+              prob1: float,  # probability of selecting a sentence from sentences1
+              num_sentences: int,
+              ):
+    res: str = ''
+    for _ in range(num_sentences):
+        if random.random() < prob1:
+            sentence = ' '.join(sentences1.pop())
+        else:
+            sentence = ' '.join(sentences2.pop())
+        res += sentence + ' '
+    res += '\n'
+
+    return res
 
 
 # load all sentences
@@ -72,45 +90,36 @@ num_docs = len(text_in_file.split('\n'))
 num_total_sentences = len(part1_sentences) + len(part2_sentences)
 num_sentences_per_doc = num_total_sentences // num_docs
 lines = []
-
-
-def make_line(sentences1: List[List[str]],
-              sentences2: List[List[str]],
-              prob1: float,  # probability of selecting a sentence from sentences1
-              num_sentences: int,
-              ):
-    res: str = ''
-    for _ in range(num_sentences):
-        if random.random() < prob1:
-            sentence = ' '.join(sentences1.pop())
-        else:
-            sentence = ' '.join(sentences2.pop())
-        res += sentence + ' '
-    res += '\n'
-
-    return res
-
-
-for doc_id, prob1 in enumerate(np.linspace(1, 0, num_docs)):
+prob1_end = 1 / DIVISOR
+prob1_start = 1 - prob1_end
+for doc_id, prob1 in enumerate(np.linspace(prob1_start, prob1_end, num_docs)):
     try:
         line = make_line(part1_sentences, part2_sentences, prob1, num_sentences_per_doc)
     except IndexError:  # pop from empty list
         break
     lines.append(line)
 
-# put leftover sentences in last doc/line
-if len(part1_sentences) > 0:
-    last_line = make_line(part1_sentences, [], 1.0, len(part1_sentences))
-elif len(part2_sentences) > 0:
-    last_line = make_line(part2_sentences, [], 1.0, len(part2_sentences))
-else:
-    raise RuntimeError
-lines.append(last_line)
+
+# randomly insert leftover sentences
+while part1_sentences or part2_sentences:
+    doc_id = np.random.randint(0, len(lines), 1).item()
+    lines[doc_id].rstrip('\n')
+    for sentences in [part1_sentences, part2_sentences]:
+        try:
+            s = sentences.pop()
+        except IndexError:  # empty
+            continue
+        else:
+            lines[doc_id] += ' ' + ' '.join(s) + '\n'
+            break
+    else:
+        raise RuntimeError
 assert len(part1_sentences) == 0
 assert len(part2_sentences) == 0
 
 # save to file
-out_path = configs.Dirs.root / 'reordered_corpora' / f'{CORPUS_NAME}-ce-g.txt'
+suffix = f'ce-g{DIVISOR}'
+out_path = configs.Dirs.root / 'reordered_corpora' / f'{CORPUS_NAME}-{suffix}.txt'
 out_file = out_path.open('w')
 for n, line in enumerate(lines):
     # print(f'Writing line {n}')
