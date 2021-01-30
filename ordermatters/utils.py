@@ -29,11 +29,10 @@ def make_prep_from_naturalistic(corpus_name: str,
 
 
 def make_test_words(prep: PartitionedPrep,
-                    corpus_name: str,
                     words_name: str,
                     remove_numbers: bool = True) -> List[str]:
-    number_words = (configs.Dirs.words / f'{corpus_name}-numbers.txt').open().read().split("\n")
-    test_words_all = (configs.Dirs.words / f'{corpus_name}-{words_name}.txt').open().read().split("\n")
+    number_words = (configs.Dirs.words / f'numbers.txt').open().read().split("\n")
+    test_words_all = (configs.Dirs.words / f'{words_name}.txt').open().read().split("\n")
 
     test_words = []
     for w in test_words_all:

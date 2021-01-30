@@ -44,7 +44,7 @@ def collect_data(ws: np.ndarray) -> float:
 # get data
 prep = make_prep_from_naturalistic(CORPUS_NAME, REMOVE_SYMBOLS,
                                    context_size=DISTANCE * 2)  # +1 is added by prep to make "window")
-test_words = make_test_words(prep, CORPUS_NAME, WORDS_NAME, REMOVE_NUMBERS)
+test_words = make_test_words(prep, WORDS_NAME, REMOVE_NUMBERS)
 test_words = set(test_words)
 test_word_ids = [prep.store.w2id[w] for w in test_words]
 windows = make_windows(prep)

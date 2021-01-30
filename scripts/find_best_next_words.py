@@ -78,7 +78,7 @@ def process(_q, _iolock, _nw_id2row_ids, _test_word_windows, min_target, max_tar
 if DISTANCE != 1:
     raise NotImplementedError('if distance != 1, this would require modifying context_size.')
 prep = make_prep_from_naturalistic(CORPUS_NAME, REMOVE_SYMBOLS, context_size=1)
-test_words = make_test_words(prep, CORPUS_NAME, WORDS_NAME, REMOVE_NUMBERS)
+test_words = make_test_words(prep, WORDS_NAME, REMOVE_NUMBERS)
 test_word_ids = [prep.store.w2id[w] for w in test_words]
 windows = make_windows(prep)
 row_ids = np.isin(windows[:, -2], test_word_ids)

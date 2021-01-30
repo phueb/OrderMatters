@@ -30,7 +30,7 @@ WORDS_NAME = 'sem-4096'
 
 
 prep = make_prep_from_naturalistic(CORPUS_NAME, REMOVE_SYMBOLS, context_size=2)
-test_words = make_test_words(prep, CORPUS_NAME, WORDS_NAME, REMOVE_NUMBERS)
+test_words = make_test_words(prep, WORDS_NAME, REMOVE_NUMBERS)
 test_word_ids = [prep.store.w2id[w] for w in test_words]
 
 if RIGHT_NEIGHBORS:

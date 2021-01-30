@@ -24,17 +24,16 @@ from ordermatters.figs import make_info_theory_fig
 from ordermatters.utils import make_prep_from_naturalistic, make_windows, make_test_words
 
 
-TOY_DATA = True
+TOY_DATA = False
 
 # CORPUS_NAME = 'newsela'
-CORPUS_NAME = 'childes-20191206'
-WORDS_NAME = 'sem-4096'
+CORPUS_NAME = 'childes-20201026'
+WORDS_NAME = 'nouns-annotated'
 DISTANCE = + 1
 REMOVE_NUMBERS = True
 REMOVE_SYMBOLS = None
 
-Y_LIMS = [0, 1]
-SHOW_COMPONENTS = True
+SHOW_COMPONENTS = False
 
 
 def collect_data(ws: np.ndarray) -> Tuple[float, float]:
@@ -47,8 +46,6 @@ def collect_data(ws: np.ndarray) -> Tuple[float, float]:
     # val1
     x1 = ws[:, -2]  # all words
     y1 = ws[:, -2 + DISTANCE]  # neighbors
-    xy1 = np.vstack((x1, y1))
-    je1 = drv.entropy_joint(xy1)
     val1i = drv.entropy_conditional(x1, y1).item() / drv.entropy(x1).item()
 
     ###############
@@ -68,8 +65,6 @@ def collect_data(ws: np.ndarray) -> Tuple[float, float]:
     # val2
     x2 = test_word_windows[:, -2]  # test_word
     y2 = test_word_windows[:, -2 + DISTANCE]  # neighbors
-    xy2 = np.vstack((x2, y2))
-    je2 = drv.entropy_joint(xy2)
     val2i = drv.entropy_conditional(x2, y2).item() / drv.entropy(x2).item()
 
     print(f'{len(ws):>12,} | val1={val1i:.3f} val2={val2i:.2f}')
@@ -93,7 +88,7 @@ if TOY_DATA:
 else:
     tc = None
     prep = make_prep_from_naturalistic(CORPUS_NAME, REMOVE_SYMBOLS)
-    test_words = make_test_words(prep, CORPUS_NAME, WORDS_NAME, REMOVE_NUMBERS)
+    test_words = make_test_words(prep, WORDS_NAME, REMOVE_NUMBERS)
 
 test_words = set(test_words)
 test_word_ids = [prep.store.w2id[w] for w in test_words]
@@ -136,7 +131,7 @@ if SHOW_COMPONENTS:
         x_ticks,
         labels1,
         labels2,
-        y_lims=Y_LIMS,
+        y_lims=[0, 1],
     )
     plt.show()
 
@@ -155,7 +150,7 @@ if SHOW_COMPONENTS:
         x_ticks,
         labels1,
         labels2,
-        y_lims=Y_LIMS,
+        y_lims=[0, 1],
     )
     plt.show()
 
@@ -174,7 +169,7 @@ make_info_theory_fig([
     x_ticks,
     labels1,
     labels2,
-    y_lims=[-0.1, 0.1],
+    y_lims=[0, 0.5],
 )
 plt.show()
 
