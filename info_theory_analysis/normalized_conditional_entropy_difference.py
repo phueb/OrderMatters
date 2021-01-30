@@ -27,19 +27,19 @@ from ordermatters.utils import make_prep_from_naturalistic, make_windows, make_t
 TOY_DATA = False
 
 # CORPUS_NAME = 'newsela'
-CORPUS_NAME = 'childes-20201026'
-WORDS_NAME = 'nouns-annotated'
+CORPUS_NAME = 'childes-20191206'
+WORDS_NAME = 'childes-20191206-sem-4096'
 DISTANCE = + 1
 REMOVE_NUMBERS = True
 REMOVE_SYMBOLS = None
 
-SHOW_COMPONENTS = False
+SHOW_COMPONENTS = True
 
 
 def collect_data(ws: np.ndarray) -> Tuple[float, float]:
 
     ###############
-    # val1: use all windows; this provides a control/reference from which to measure distance to val2
+    # val1: use all windows; this provides a control/reference from which to measure difference to val2
     # (should be 0.0 when using toy corpus)
     ###############
 
@@ -51,11 +51,6 @@ def collect_data(ws: np.ndarray) -> Tuple[float, float]:
     ###############
     # val2: use only test_word windows
     # in theory, this should be invariant to number of test-word types,
-    # but in practice, given fewer test word types, their next-word distributions will be more dense,
-    # and thus result in a lower mutual information estimate compared to less dense next-word distributions,
-    # which occurs when there are a greater number of test word types.
-    # in other words, this measure approaches the ground truth (zero)
-    # as the number of samples for each test word type increases
     ###############
 
     # test_word windows
@@ -169,7 +164,7 @@ make_info_theory_fig([
     x_ticks,
     labels1,
     labels2,
-    y_lims=[0, 0.5],
+    y_lims=[0, 0.2],
 )
 plt.show()
 
