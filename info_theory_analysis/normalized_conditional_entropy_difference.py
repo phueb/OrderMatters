@@ -1,11 +1,11 @@
 """
 A new quantity for quantifying whether a corpus "starts-good":
 
-mi1 - mi2, where
-mi1 measures the relationship between all words in corpus and their neighbors
-mi2 measures the relationship between individual test words and their neighbors
+ce_xy2 - ce_xy1, where
+ce_xy1 measures the uncertainty about all words in corpus given their neighbors
+ce_xy2 measures the uncertainty about individual test words given their neighbors
 
-a "good start should have large difference
+a "good start should have large difference (e.g high ce_xy2, and low ce_xy1)
 
 
 """
@@ -32,9 +32,8 @@ WORDS_NAME = 'sem-4096'
 DISTANCE = + 1
 REMOVE_NUMBERS = True
 REMOVE_SYMBOLS = None
-NORM_FACTOR = 'Y'
 
-Y_LIMS = None
+Y_LIMS = [0, 1]
 SHOW_COMPONENTS = True
 
 
@@ -48,7 +47,9 @@ def collect_data(ws: np.ndarray) -> Tuple[float, float]:
     # val1
     x1 = ws[:, -2]  # all words
     y1 = ws[:, -2 + DISTANCE]  # neighbors
-    val1i = drv.information_mutual_normalised(x1, y1, norm_factor=NORM_FACTOR).item()
+    xy1 = np.vstack((x1, y1))
+    je1 = drv.entropy_joint(xy1)
+    val1i = drv.entropy_conditional(x1, y1).item() / drv.entropy(x1).item()
 
     ###############
     # val2: use only test_word windows
@@ -67,7 +68,9 @@ def collect_data(ws: np.ndarray) -> Tuple[float, float]:
     # val2
     x2 = test_word_windows[:, -2]  # test_word
     y2 = test_word_windows[:, -2 + DISTANCE]  # neighbors
-    val2i = drv.information_mutual_normalised(x2, y2, norm_factor=NORM_FACTOR).item()
+    xy2 = np.vstack((x2, y2))
+    je2 = drv.entropy_joint(xy2)
+    val2i = drv.entropy_conditional(x2, y2).item() / drv.entropy(x2).item()
 
     print(f'{len(ws):>12,} | val1={val1i:.3f} val2={val2i:.2f}')
 
@@ -121,8 +124,8 @@ if SHOW_COMPONENTS:
     # fig - val 1
     title = f'Component 1\n' + title_additional
     x_axis_label = f'Location in {"toy data" if TOY_DATA else CORPUS_NAME} [num tokens]'
-    y_axis_label = 'Mutual Information [bits]'
-    labels1 = ['I(all X;Y)']
+    y_axis_label = 'Normalized Entropy'
+    labels1 = ['H(all X|Y)']
     labels2 = ['age-ordered', 'reverse age-ordered']
     make_info_theory_fig([
         val1,
@@ -133,14 +136,15 @@ if SHOW_COMPONENTS:
         x_ticks,
         labels1,
         labels2,
+        y_lims=Y_LIMS,
     )
     plt.show()
 
     # fig - val 2
     title = f'Component 2\n' + title_additional
     x_axis_label = f'Location in {"toy data" if TOY_DATA else CORPUS_NAME} [num tokens]'
-    y_axis_label = 'Mutual Information [bits]'
-    labels1 = ['I(test-word X;Y)']
+    y_axis_label = 'Normalized Entropy'
+    labels1 = ['H(test-word X|Y)']
     labels2 = ['age-ordered', 'reverse age-ordered']
     make_info_theory_fig([
         val2,
@@ -151,17 +155,18 @@ if SHOW_COMPONENTS:
         x_ticks,
         labels1,
         labels2,
+        y_lims=Y_LIMS,
     )
     plt.show()
 
 # fig - both values together
 title = f'Component 1 - Component 2\n' + title_additional
 x_axis_label = f'Location in {"toy data" if TOY_DATA else CORPUS_NAME} [num tokens]'
-y_axis_label = 'Mutual Information [bits]'
-labels1 = ['I(all X;Y) - I(test-word X;Y)']
+y_axis_label = 'Normalized Entropy'
+labels1 = ['H(test-word X|Y) - H(all X|Y)']
 labels2 = ['age-ordered', 'reverse age-ordered']
 make_info_theory_fig([
-    np.subtract(val1, val2),
+    np.subtract(val2, val1),
 ],
     title,
     x_axis_label,
@@ -169,7 +174,7 @@ make_info_theory_fig([
     x_ticks,
     labels1,
     labels2,
-    y_lims=Y_LIMS,
+    y_lims=[-0.1, 0.1],
 )
 plt.show()
 

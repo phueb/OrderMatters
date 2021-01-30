@@ -28,8 +28,8 @@ class ToyCorpus:
                  doc_size: int = 10_000,
                  num_types: int = 4096,
                  doc_offset: int = 0,  # the larger, the faster the noun population reaches its maximum
-                 increase_noun_types: bool = True,  # whether to gradually introduce new nouns
-                 increase_other_types: bool = False,  # whether to gradually introduce new others
+                 increase_noun_types: bool = False,  # whether to gradually introduce new nouns
+                 increase_other_types: bool = True,  # whether to gradually introduce new others
                  ) -> None:
         self.num_docs = num_docs
         self.doc_size = doc_size
