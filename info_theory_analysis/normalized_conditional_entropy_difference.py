@@ -125,7 +125,7 @@ if SHOW_COMPONENTS:
     title = f'Component 1\n' + title_additional
     x_axis_label = f'Location in {"toy data" if TOY_DATA else CORPUS_NAME} [num tokens]'
     y_axis_label = 'Normalized Entropy'
-    labels1 = ['H(all X|Y)']
+    labels1 = ['H(all X|Y) / H(all X)']
     labels2 = ['age-ordered', 'reverse age-ordered']
     make_info_theory_fig([
         val1,
@@ -144,7 +144,7 @@ if SHOW_COMPONENTS:
     title = f'Component 2\n' + title_additional
     x_axis_label = f'Location in {"toy data" if TOY_DATA else CORPUS_NAME} [num tokens]'
     y_axis_label = 'Normalized Entropy'
-    labels1 = ['H(test-word X|Y)']
+    labels1 = ['H(test-word X|Y) / H(test-word X)']
     labels2 = ['age-ordered', 'reverse age-ordered']
     make_info_theory_fig([
         val2,
@@ -163,7 +163,7 @@ if SHOW_COMPONENTS:
 title = f'Component 1 - Component 2\n' + title_additional
 x_axis_label = f'Location in {"toy data" if TOY_DATA else CORPUS_NAME} [num tokens]'
 y_axis_label = 'Normalized Entropy'
-labels1 = ['H(test-word X|Y) - H(all X|Y)']
+labels1 = ['H(test-word X|Y) / H(test-word X) - H(all X|Y) / H(all X)']
 labels2 = ['age-ordered', 'reverse age-ordered']
 make_info_theory_fig([
     np.subtract(val2, val1),
